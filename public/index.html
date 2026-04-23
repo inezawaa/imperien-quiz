@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Question pour un Impérien</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --or: #C9A84C;
+    --or-clair: #F0D080;
+    --or-fonce: #8B6914;
+    --noir: #0A0A0A;
+    --noir-card: #111111;
+    --noir-panel: #1A1A1A;
+    --rouge: #8B0000;
+    --blanc: #F5F0E8;
+    --glow: 0 0 20px rgba(201,168,76,0.4), 0 0 40px rgba(201,168,76,0.2);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--noir);
+    color: var(--blanc);
+    font-family: 'Raleway', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image: 
+      radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.03) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(201,168,76,0.03) 0%, transparent 60%);
+  }
+
+  /* ── Ornements ── */
+  .ornemental-line {
+    display: flex; align-items: center; gap: 12px;
+    margin: 10px 0;
+  }
+  .ornemental-line::before, .ornemental-line::after {
+    content: ''; flex: 1;
+    height: 1px; background: linear-gradient(90deg, transparent, var(--or), transparent);
+  }
+  .ornemental-line span { color: var(--or); font-size: 18px; }
+
+  /* ── ÉCRANS ── */
+  .screen { display: none; min-height: 100vh; padding: 20px; flex-direction: column; align-items: center; justify-content: center; }
+  .screen.active { display: flex; }
+
+  /* ── LOBBY ── */
+  #screen-lobby {
+    text-align: center;
+    background: radial-gradient(ellipse at center, #1a1500 0%, var(--noir) 70%);
+  }
+
+  .logo-container { margin-bottom: 30px; animation: fadeInDown 1s ease; }
+  .logo-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(22px, 6vw, 36px);
+    color: var(--or);
+    text-shadow: var(--glow);
+    line-height: 1.2;
+    letter-spacing: 2px;
+  }
+  .logo-subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--or-fonce);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  .join-form { width: 100%; max-width: 340px; }
+  .form-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--or-fonce);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+
+  .pseudo-input {
+    width: 100%;
+    background: rgba(201,168,76,0.05);
+    border: 1px solid var(--or-fonce);
+    border-radius: 4px;
+    padding: 16px 20px;
+    color: var(--or-clair);
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    text-align: center;
+    outline: none;
+    transition: all 0.3s;
+    letter-spacing: 2px;
+  }
+  .pseudo-input:focus {
+    border-color: var(--or);
+    box-shadow: var(--glow);
+    background: rgba(201,168,76,0.08);
+  }
+  .pseudo-input::placeholder { color: rgba(201,168,76,0.3); font-size: 14px; letter-spacing: 1px; }
+
+  .btn-rejoindre {
+    width: 100%;
+    margin-top: 16px;
+    padding: 18px;
+    background: linear-gradient(135deg, var(--or-fonce), var(--or), var(--or-clair), var(--or));
+    background-size: 300% 300%;
+    animation: shimmer 3s ease infinite;
+    border: none;
+    border-radius: 4px;
+    color: var(--noir);
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-rejoindre:hover { transform: translateY(-2px); box-shadow: var(--glow); }
+  .btn-rejoindre:active { transform: translateY(0); }
+
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* ── SALLE D'ATTENTE ── */
+  #screen-waiting {
+    text-align: center;
+    background: radial-gradient(ellipse at center, #0d1100 0%, var(--noir) 70%);
+  }
+
+  .waiting-pseudo {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(24px, 7vw, 42px);
+    color: var(--or);
+    text-shadow: var(--glow);
+    margin: 10px 0;
+  }
+  .waiting-status {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--or-fonce);
+    text-transform: uppercase;
+    margin-top: 20px;
+  }
+  .pulse-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--or);
+    border-radius: 50%;
+    animation: pulse 1.5s ease infinite;
+    margin: 0 3px;
+  }
+  .pulse-dot:nth-child(2) { animation-delay: 0.3s; }
+  .pulse-dot:nth-child(3) { animation-delay: 0.6s; }
+  @keyframes pulse { 0%,100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
+
+  .player-count {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    color: var(--or);
+    margin-top: 30px;
+  }
+  .player-count span { font-size: 48px; display: block; }
+
+  /* ── INTRO MANCHE ── */
+  #screen-intro {
+    text-align: center;
+    background: #000;
+  }
+  .intro-round-label {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 8px;
+    color: var(--or-fonce);
+    text-transform: uppercase;
+    animation: fadeIn 0.5s ease 0.5s both;
+  }
+  .intro-round-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(28px, 8vw, 60px);
+    color: var(--or);
+    text-shadow: 0 0 40px rgba(201,168,76,0.8), 0 0 80px rgba(201,168,76,0.4);
+    line-height: 1.2;
+    margin: 20px 0;
+    animation: introReveal 1s ease 0.8s both;
+  }
+  @keyframes introReveal {
+    0% { opacity: 0; transform: scale(0.8); letter-spacing: 20px; }
+    100% { opacity: 1; transform: scale(1); letter-spacing: 2px; }
+  }
+  .intro-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  .intro-content { position: relative; z-index: 1; }
+
+  /* ── QUESTION ── */
+  #screen-question { justify-content: flex-start; padding: 0; }
+
+  .question-header {
+    width: 100%;
+    background: linear-gradient(180deg, #0f0f0f, transparent);
+    padding: 20px 20px 10px;
+    text-align: center;
+  }
+  .round-indicator {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: var(--or-fonce);
+    text-transform: uppercase;
+  }
+  .question-counter {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--or);
+    margin-top: 4px;
+  }
+
+  /* Timer */
+  .timer-container {
+    width: 100%;
+    padding: 10px 20px;
+    position: relative;
+  }
+  .timer-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .timer-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--or-fonce), var(--or), var(--or-clair));
+    border-radius: 3px;
+    transition: width 0.9s linear;
+    width: 100%;
+  }
+  .timer-bar.urgent { background: linear-gradient(90deg, #8B0000, #FF4444); }
+  .timer-value {
+    text-align: center;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 36px;
+    color: var(--or);
+    margin: 6px 0;
+    transition: color 0.3s;
+  }
+  .timer-value.urgent { color: #FF4444; text-shadow: 0 0 20px rgba(255,68,68,0.6); }
+
+  /* Question text */
+  .question-text-container {
+    width: 100%;
+    padding: 10px 20px 16px;
+    text-align: center;
+  }
+  .question-text {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(15px, 4vw, 20px);
+    color: var(--blanc);
+    line-height: 1.5;
+  }
+
+  /* Choix */
+  .choices-grid {
+    width: 100%;
+    padding: 0 16px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    flex: 1;
+  }
+  .choice-btn {
+    background: var(--noir-card);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 8px;
+    padding: 16px 12px;
+    color: var(--blanc);
+    font-family: 'Raleway', sans-serif;
+    font-size: clamp(13px, 3.5vw, 16px);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-height: 90px;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .choice-letter {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 18px;
+    color: var(--or);
+    font-weight: 700;
+  }
+  .choice-btn:active { transform: scale(0.97); }
+  .choice-btn:not(.disabled):hover { border-color: var(--or); background: rgba(201,168,76,0.08); }
+  .choice-btn.selected { border-color: var(--or); background: rgba(201,168,76,0.15); box-shadow: var(--glow); }
+  .choice-btn.correct { border-color: #4CAF50; background: rgba(76,175,80,0.2); box-shadow: 0 0 20px rgba(76,175,80,0.4); }
+  .choice-btn.wrong { border-color: #F44336; background: rgba(244,67,54,0.15); opacity: 0.7; }
+  .choice-btn.disabled { cursor: default; pointer-events: none; }
+
+  /* ── RÉPONSE ENVOYÉE ── */
+  .answered-banner {
+    display: none;
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    background: rgba(201,168,76,0.1);
+    border-top: 1px solid var(--or-fonce);
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--or);
+    text-transform: uppercase;
+  }
+
+  /* ── ÉLIMINÉ ── */
+  #screen-eliminated {
+    text-align: center;
+    background: radial-gradient(ellipse at center, #1a0000 0%, var(--noir) 70%);
+  }
+  .eliminated-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(28px, 8vw, 48px);
+    color: #8B0000;
+    text-shadow: 0 0 30px rgba(139,0,0,0.6);
+    margin: 20px 0;
+  }
+  .eliminated-score {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    color: var(--or-fonce);
+    letter-spacing: 3px;
+  }
+  .spectator-badge {
+    margin-top: 30px;
+    padding: 12px 24px;
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 4px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--or-fonce);
+    text-transform: uppercase;
+  }
+
+  /* ── SCORES MANCHE ── */
+  #screen-scores { padding: 20px; }
+  .scores-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 20px;
+    color: var(--or);
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: var(--glow);
+  }
+  .score-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    background: var(--noir-card);
+    border: 1px solid rgba(201,168,76,0.1);
+    border-radius: 6px;
+    transition: all 0.3s;
+  }
+  .score-item.top1 { border-color: var(--or); background: rgba(201,168,76,0.08); }
+  .score-rank {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 20px;
+    color: var(--or-fonce);
+    width: 30px;
+  }
+  .score-rank.gold { color: var(--or); font-size: 24px; }
+  .score-pseudo {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    color: var(--blanc);
+    flex: 1;
+  }
+  .score-points {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 18px;
+    color: var(--or);
+  }
+  .score-item.eliminated-score-item { opacity: 0.4; }
+
+  /* ── GAME OVER ── */
+  #screen-gameover {
+    text-align: center;
+    background: radial-gradient(ellipse at center, #1a1200 0%, var(--noir) 70%);
+  }
+  .winner-title {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 6px;
+    color: var(--or-fonce);
+    text-transform: uppercase;
+  }
+  .winner-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(32px, 9vw, 56px);
+    color: var(--or);
+    text-shadow: 0 0 40px rgba(201,168,76,0.8);
+    margin: 16px 0;
+    animation: pulse-winner 2s ease infinite;
+  }
+  @keyframes pulse-winner { 0%,100% { text-shadow: 0 0 40px rgba(201,168,76,0.8); } 50% { text-shadow: 0 0 60px rgba(201,168,76,1), 0 0 100px rgba(201,168,76,0.6); } }
+
+  /* ── Paused ── */
+  .paused-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .paused-overlay.active { display: flex; }
+  .paused-text {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 28px;
+    color: var(--or);
+    text-shadow: var(--glow);
+    animation: blink 1.5s ease infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* ── Animations ── */
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .error-msg {
+    color: #FF4444;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    margin-top: 10px;
+    text-align: center;
+    min-height: 20px;
+  }
+</style>
+</head>
+<body>
+
+<!-- PAUSED OVERLAY -->
+<div class="paused-overlay" id="paused-overlay">
+  <div class="paused-text">⏸ PAUSE</div>
+  <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;color:var(--or-fonce);">LE MAÎTRE DU JEU A SUSPENDU LA PARTIE</div>
+</div>
+
+<!-- ÉCRAN 1 : LOBBY -->
+<div class="screen active" id="screen-lobby">
+  <div class="logo-container">
+    <div class="logo-title">Question pour un<br>Impérien</div>
+    <div class="logo-subtitle">⚔ Légion · Saint Seiya Awakening ⚔</div>
+  </div>
+  <div class="ornemental-line"><span>✦</span></div>
+  <div class="join-form">
+    <label class="form-label">Ton pseudo de légionnaire</label>
+    <input type="text" class="pseudo-input" id="pseudo-input" placeholder="Entre ton pseudo..." maxlength="20" autocomplete="off">
+    <div class="error-msg" id="error-msg"></div>
+    <button class="btn-rejoindre" id="btn-join">⚔ REJOINDRE L'ÉPREUVE</button>
+  </div>
+</div>
+
+<!-- ÉCRAN 2 : SALLE D'ATTENTE -->
+<div class="screen" id="screen-waiting">
+  <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:5px;color:var(--or-fonce);text-transform:uppercase;">Légionnaire</div>
+  <div class="waiting-pseudo" id="waiting-pseudo">-</div>
+  <div class="ornemental-line"><span>✦</span></div>
+  <div class="player-count">
+    Légionnaires prêts
+    <span id="player-count-num">0</span>
+  </div>
+  <div class="waiting-status">
+    En attente du Maître du Jeu
+    <br><br>
+    <span class="pulse-dot"></span>
+    <span class="pulse-dot"></span>
+    <span class="pulse-dot"></span>
+  </div>
+</div>
+
+<!-- ÉCRAN 3 : INTRO MANCHE -->
+<div class="screen" id="screen-intro">
+  <canvas class="intro-particles" id="intro-canvas"></canvas>
+  <div class="intro-content">
+    <div class="intro-round-label" id="intro-round-label">— Manche 1 —</div>
+    <div class="ornemental-line"><span>✦</span></div>
+    <div class="intro-round-name" id="intro-round-name">Épreuve du Bronze</div>
+    <div class="ornemental-line"><span>✦</span></div>
+  </div>
+</div>
+
+<!-- ÉCRAN 4 : QUESTION -->
+<div class="screen" id="screen-question">
+  <div class="question-header">
+    <div class="round-indicator" id="q-round-indicator">Épreuve du Bronze</div>
+    <div class="question-counter" id="q-counter">Question 1 / 8</div>
+  </div>
+  <div class="timer-container">
+    <div class="timer-value" id="timer-display">30</div>
+    <div class="timer-bar-bg"><div class="timer-bar" id="timer-bar"></div></div>
+  </div>
+  <div class="question-text-container">
+    <div class="question-text" id="question-text">...</div>
+  </div>
+  <div class="choices-grid" id="choices-grid"></div>
+  <div class="answered-banner" id="answered-banner">✦ Réponse enregistrée ✦</div>
+</div>
+
+<!-- ÉCRAN 5 : ÉLIMINÉ -->
+<div class="screen" id="screen-eliminated">
+  <div style="font-size:60px;">💀</div>
+  <div class="eliminated-title">ÉLIMINÉ</div>
+  <div class="eliminated-score" id="elim-score">Score final : 0 pts</div>
+  <div class="spectator-badge">👁 Mode Spectateur Actif</div>
+  <div style="margin-top:20px;font-family:'Raleway',sans-serif;font-size:13px;color:rgba(255,255,255,0.4);padding:0 30px;text-align:center;">
+    Tu peux continuer à suivre la partie...
+  </div>
+</div>
+
+<!-- ÉCRAN 6 : SCORES MANCHE -->
+<div class="screen" id="screen-scores">
+  <div class="scores-title" id="scores-round-name">Classement</div>
+  <div class="ornemental-line"><span>✦</span></div>
+  <div id="scores-list" style="width:100%;max-width:400px;margin:0 auto;overflow-y:auto;"></div>
+</div>
+
+<!-- ÉCRAN 7 : GAME OVER -->
+<div class="screen" id="screen-gameover">
+  <div style="font-size:50px;margin-bottom:10px;">🏆</div>
+  <div class="winner-title">GRAND VAINQUEUR</div>
+  <div class="winner-name" id="winner-name">-</div>
+  <div class="ornemental-line"><span>✦</span></div>
+  <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;color:var(--or-fonce);margin-top:20px;">CLASSEMENT FINAL</div>
+  <div id="final-scores-list" style="width:100%;max-width:400px;margin-top:16px;overflow-y:auto;"></div>
+</div>
+
+<script>
+const WS_URL = `wss://${location.host}`;
+let ws;
+let myId = null;
+let myPseudo = '';
+let isEliminated = false;
+let currentQuestion = null;
+let hasAnswered = false;
+let timerInterval = null;
+let audioCtx = null;
+let bipScheduled = false;
+
+// ── Connexion WebSocket ─────────────────────────────────────────────────────
+function connect() {
+  ws = new WebSocket(WS_URL);
+  ws.onopen = () => console.log('✅ Connecté');
+  ws.onmessage = (e) => handleMessage(JSON.parse(e.data));
+  ws.onclose = () => setTimeout(connect, 2000);
+}
+
+// ── Afficher un écran ───────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── Audio Context ───────────────────────────────────────────────────────────
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playBip(freq = 880, duration = 0.1, type = 'sine') {
+  try {
+    const ctx = getAudio();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = type; osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start(); osc.stop(ctx.currentTime + duration);
+  } catch(e) {}
+}
+
+function playSuccess() {
+  [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => playBip(f, 0.15, 'triangle'), i * 80));
+}
+
+function playEliminated() {
+  [200, 150, 100].forEach((f, i) => setTimeout(() => playBip(f, 0.3, 'sawtooth'), i * 200));
+}
+
+function playIntroFanfare() {
+  [523, 523, 784, 523, 784, 1047].forEach((f, i) => setTimeout(() => playBip(f, 0.2, 'triangle'), i * 120));
+}
+
+// ── Gestion des messages ────────────────────────────────────────────────────
+function handleMessage(msg) {
+  switch(msg.type) {
+
+    case 'joined':
+      myId = msg.id;
+      myPseudo = msg.pseudo;
+      document.getElementById('waiting-pseudo').textContent = msg.pseudo;
+      showScreen('screen-waiting');
+      break;
+
+    case 'error':
+      document.getElementById('error-msg').textContent = msg.message;
+      break;
+
+    case 'player_joined':
+      document.getElementById('player-count-num').textContent = msg.totalPlayers;
+      break;
+
+    case 'game_state':
+      document.getElementById('player-count-num').textContent = Object.keys(msg.players || {}).length;
+      if (msg.paused) {
+        document.getElementById('paused-overlay').classList.add('active');
+      } else {
+        document.getElementById('paused-overlay').classList.remove('active');
+      }
+      break;
+
+    case 'pause':
+      if (msg.paused) {
+        document.getElementById('paused-overlay').classList.add('active');
+        if (timerInterval) clearInterval(timerInterval);
+      } else {
+        document.getElementById('paused-overlay').classList.remove('active');
+      }
+      break;
+
+    case 'manche_intro':
+      showIntro(msg);
+      break;
+
+    case 'question':
+      showQuestion(msg);
+      break;
+
+    case 'timer':
+      updateTimer(msg.value);
+      break;
+
+    case 'answer_received':
+      hasAnswered = true;
+      document.getElementById('answered-banner').style.display = 'block';
+      document.querySelectorAll('.choice-btn').forEach(b => b.classList.add('disabled'));
+      break;
+
+    case 'reveal_answer':
+      revealAnswer(msg.correctIndex);
+      break;
+
+    case 'round_end':
+      setTimeout(() => showScores(msg), 1500);
+      break;
+
+    case 'eliminated':
+      if (msg.playerId === myId) {
+        isEliminated = true;
+        playEliminated();
+        showScreen('screen-eliminated');
+      }
+      break;
+
+    case 'game_over':
+      showGameOver(msg);
+      break;
+
+    case 'reset':
+      location.reload();
+      break;
+  }
+}
+
+// ── Intro Manche ────────────────────────────────────────────────────────────
+function showIntro(msg) {
+  document.getElementById('intro-round-label').textContent = msg.isFinal ? '⚔ FINALE ⚔' : `— Manche ${msg.roundNumber} —`;
+  document.getElementById('intro-round-name').textContent = msg.roundName;
+  showScreen('screen-intro');
+  startParticles();
+  playIntroFanfare();
+}
+
+function startParticles() {
+  const canvas = document.getElementById('intro-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const particles = Array.from({length: 60}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: (Math.random() - 0.5) * 0.5,
+    vy: -Math.random() * 1 - 0.5,
+    size: Math.random() * 3 + 1,
+    alpha: Math.random(),
+    color: Math.random() > 0.5 ? '#C9A84C' : '#F0D080'
+  }));
+  let raf;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.alpha -= 0.003;
+      if (p.alpha <= 0) { p.alpha = 1; p.y = canvas.height + 10; p.x = Math.random() * canvas.width; }
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    raf = requestAnimationFrame(draw);
+  }
+  draw();
+  setTimeout(() => cancelAnimationFrame(raf), 5000);
+}
+
+// ── Question ────────────────────────────────────────────────────────────────
+function showQuestion(msg) {
+  if (isEliminated) {
+    // Spectateur : voir la question mais ne pas pouvoir répondre
+    showScreen('screen-question');
+  }
+  currentQuestion = msg;
+  hasAnswered = false;
+  document.getElementById('answered-banner').style.display = 'none';
+  document.getElementById('q-round-indicator').textContent = msg.roundName;
+  document.getElementById('q-counter').textContent = `Question ${msg.questionIndex + 1} / ${msg.totalQuestions}`;
+  document.getElementById('question-text').textContent = msg.question;
+
+  // Timer
+  document.getElementById('timer-display').textContent = '30';
+  document.getElementById('timer-display').classList.remove('urgent');
+  document.getElementById('timer-bar').style.width = '100%';
+  document.getElementById('timer-bar').classList.remove('urgent');
+
+  // Choix
+  const letters = ['A', 'B', 'C', 'D'];
+  const grid = document.getElementById('choices-grid');
+  grid.innerHTML = '';
+  msg.choices.forEach((choice, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn' + (isEliminated ? ' disabled' : '');
+    btn.innerHTML = `<span class="choice-letter">${letters[i]}</span>${choice}`;
+    btn.dataset.index = i;
+    if (!isEliminated) {
+      btn.addEventListener('click', () => sendAnswer(i));
+    }
+    grid.appendChild(btn);
+  });
+
+  showScreen('screen-question');
+  bipScheduled = false;
+}
+
+function sendAnswer(index) {
+  if (hasAnswered || isEliminated) return;
+  ws.send(JSON.stringify({ type: 'answer', answerIndex: index }));
+  // Feedback visuel immédiat
+  document.querySelectorAll('.choice-btn').forEach((b, i) => {
+    b.classList.add('disabled');
+    if (i === index) b.classList.add('selected');
+  });
+  playBip(440, 0.1, 'sine');
+}
+
+function updateTimer(val) {
+  document.getElementById('timer-display').textContent = val;
+  const pct = (val / 30) * 100;
+  document.getElementById('timer-bar').style.width = pct + '%';
+  if (val <= 10) {
+    document.getElementById('timer-display').classList.add('urgent');
+    document.getElementById('timer-bar').classList.add('urgent');
+    if (!hasAnswered) playBip(val <= 5 ? 660 : 440, 0.08, 'square');
+  }
+}
+
+function revealAnswer(correctIndex) {
+  document.querySelectorAll('.choice-btn').forEach((b, i) => {
+    b.classList.add('disabled');
+    if (i === correctIndex) b.classList.add('correct');
+    else if (b.classList.contains('selected')) b.classList.add('wrong');
+  });
+  const myBtn = document.querySelector(`.choice-btn[data-index="${correctIndex}"]`);
+  if (myBtn) {
+    const wasSelected = document.querySelector('.choice-btn.selected');
+    if (wasSelected && wasSelected.dataset.index == correctIndex) playSuccess();
+  }
+}
+
+// ── Scores ──────────────────────────────────────────────────────────────────
+function showScores(msg) {
+  document.getElementById('scores-round-name').textContent = `Fin de ${msg.roundName}`;
+  const list = document.getElementById('scores-list');
+  list.innerHTML = '';
+  const letters = ['🥇','🥈','🥉'];
+  msg.scores.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'score-item' + (i === 0 ? ' top1' : '') + (p.eliminated ? ' eliminated-score-item' : '');
+    div.innerHTML = `
+      <span class="score-rank ${i===0?'gold':''}">${letters[i] || (i+1)}</span>
+      <span class="score-pseudo">${p.pseudo}${p.eliminated ? ' 💀' : ''}</span>
+      <span class="score-points">${p.score.toLocaleString()}</span>
+    `;
+    list.appendChild(div);
+  });
+  showScreen('screen-scores');
+}
+
+// ── Game Over ────────────────────────────────────────────────────────────────
+function showGameOver(msg) {
+  document.getElementById('winner-name').textContent = msg.winner;
+  const list = document.getElementById('final-scores-list');
+  list.innerHTML = '';
+  const letters = ['🥇','🥈','🥉'];
+  msg.scores.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'score-item' + (i === 0 ? ' top1' : '');
+    div.innerHTML = `
+      <span class="score-rank ${i===0?'gold':''}">${letters[i] || (i+1)}</span>
+      <span class="score-pseudo">${p.pseudo}</span>
+      <span class="score-points">${p.score.toLocaleString()}</span>
+    `;
+    list.appendChild(div);
+  });
+  playSuccess();
+  showScreen('screen-gameover');
+}
+
+// ── Join ────────────────────────────────────────────────────────────────────
+document.getElementById('btn-join').addEventListener('click', () => {
+  const pseudo = document.getElementById('pseudo-input').value.trim();
+  if (!pseudo) { document.getElementById('error-msg').textContent = 'Entre ton pseudo !'; return; }
+  document.getElementById('error-msg').textContent = '';
+  ws.send(JSON.stringify({ type: 'join', pseudo }));
+});
+document.getElementById('pseudo-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('btn-join').click();
+});
+
+// ── Init ────────────────────────────────────────────────────────────────────
+connect();
+</script>
+</body>
+</html>
