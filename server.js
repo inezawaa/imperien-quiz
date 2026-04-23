@@ -166,10 +166,10 @@ wss.on('connection', (ws) => {
         gameState.players[id] = { id, pseudo, score: 0, eliminated: false, answered: false, answer: null, answerTime: null };
         ws.send(JSON.stringify({ type: 'joined', id, pseudo, gamePhase: gameState.phase }));
         broadcast({ type: 'player_joined', pseudo, totalPlayers: Object.keys(gameState.players).length }, id);
-        // Envoyer le game_state complet à tous les admins connectés
+        // Envoyer game_state complet aux admins
         wss.clients.forEach(client => {
           if (client.readyState === WebSocket.OPEN && client.isAdmin) {
-            client.send(JSON.stringify({ type: 'game_state', ...gameState, phase: gameState.phase, players: gameState.players }));
+            client.send(JSON.stringify({ type: 'game_state', ...gameState }));
           }
         });
         broadcastGameState();
@@ -243,9 +243,36 @@ wss.on('connection', (ws) => {
         const p = gameState.players[msg.playerId];
         if (p) {
           p.eliminated = true;
-          broadcast({ type: 'eliminated', playerId: msg.playerId, pseudo: p.pseudo });
+          // Envoyer score final au joueur éliminé
+          wss.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN && client.playerId === msg.playerId) {
+              client.send(JSON.stringify({ type: 'eliminated', playerId: msg.playerId, pseudo: p.pseudo, score: p.score }));
+            }
+          });
+          // Dire aux autres joueurs de passer en écran verdict
+          wss.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN && client.playerId && client.playerId !== msg.playerId) {
+              client.send(JSON.stringify({ type: 'verdict_time' }));
+            }
+          });
           broadcastGameState();
         }
+        break;
+      }
+
+      // ── Joueur : dernier mot ────────────────────────────────────────────────
+      case 'last_word': {
+        const p = gameState.players[ws.playerId];
+        if (!p) return;
+        const message = (msg.message || '...').slice(0, 150);
+        // Diffuser le message à tous
+        broadcast({ type: 'farewell_message', pseudo: p.pseudo, message });
+        // Notifier l'admin
+        wss.clients.forEach(client => {
+          if (client.readyState === WebSocket.OPEN && client.isAdmin) {
+            client.send(JSON.stringify({ type: 'farewell_message', pseudo: p.pseudo, message }));
+          }
+        });
         break;
       }
 
@@ -312,7 +339,13 @@ wss.on('connection', (ws) => {
         // Dire à l'admin combien ont répondu
         const answered = Object.values(gameState.players).filter(p2 => !p2.eliminated && p2.answered).length;
         const active = Object.values(gameState.players).filter(p2 => !p2.eliminated).length;
-        broadcast({ type: 'answer_count', answered, total: active });
+        // Compter les votes par choix
+        const q = getQuestion();
+        const choiceVotes = q ? new Array(q.choices.length).fill(0) : [];
+        Object.values(gameState.players).filter(p2 => !p2.eliminated && p2.answered && p2.answer !== null).forEach(p2 => {
+          if (choiceVotes[p2.answer] !== undefined) choiceVotes[p2.answer]++;
+        });
+        broadcast({ type: 'answer_count', answered, total: active, choiceVotes });
         // Auto-reveal si tout le monde a répondu
         if (answered >= active) {
           clearInterval(timerInterval);
