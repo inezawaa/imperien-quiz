@@ -361,6 +361,10 @@ function handleMsg(msg) {
       break;
     case 'player_joined':
       notify(`⚔ ${msg.pseudo} a rejoint la salle`);
+      // Mise à jour immédiate du compteur
+      if (gameData.players) {
+        document.getElementById('stat-total').textContent = Object.keys(gameData.players).length;
+      }
       break;
     case 'eliminated':
       notify(`💀 ${msg.pseudo} a été éliminé`);
