@@ -166,6 +166,12 @@ wss.on('connection', (ws) => {
         gameState.players[id] = { id, pseudo, score: 0, eliminated: false, answered: false, answer: null, answerTime: null };
         ws.send(JSON.stringify({ type: 'joined', id, pseudo, gamePhase: gameState.phase }));
         broadcast({ type: 'player_joined', pseudo, totalPlayers: Object.keys(gameState.players).length }, id);
+        // Envoyer le game_state complet à tous les admins connectés
+        wss.clients.forEach(client => {
+          if (client.readyState === WebSocket.OPEN && client.isAdmin) {
+            client.send(JSON.stringify({ type: 'game_state', ...gameState, phase: gameState.phase, players: gameState.players }));
+          }
+        });
         broadcastGameState();
         break;
       }
