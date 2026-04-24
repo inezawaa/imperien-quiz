@@ -83,15 +83,22 @@
   }
 
   #lobby-canvas {
-    position: fixed;
-    top: 0; left: 0;
+    position: fixed; top: 0; left: 0;
     width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 0;
+    pointer-events: none; z-index: 0;
   }
   #screen-lobby .logo-container,
   #screen-lobby .ornemental-line,
   #screen-lobby .join-form { position: relative; z-index: 1; }
+
+  /* Countdown */
+  #countdown-number {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(100px, 30vw, 180px);
+    color: var(--or);
+    text-shadow: 0 0 60px rgba(201,168,76,0.8);
+    animation: pulse-winner 0.6s ease infinite;
+  }
 
   .pseudo-input {
     width: 100%;
@@ -473,6 +480,26 @@
   <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;color:var(--or-fonce);">LE MAÎTRE DU JEU A SUSPENDU LA PARTIE</div>
 </div>
 
+<!-- ÉCRAN RÈGLES -->
+<div class="screen" id="screen-rules">
+  <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(16px,5vw,24px);color:var(--or);text-shadow:var(--glow);text-align:center;margin-bottom:16px;">⚔ Règles du Jeu ⚔</div>
+  <div class="ornemental-line" style="width:100%;max-width:400px;"><span>✦</span></div>
+  <div style="width:100%;max-width:400px;margin-top:16px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;">
+    <div style="font-family:'Raleway',sans-serif;font-size:13px;color:var(--blanc);line-height:1.6;padding:12px;background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:6px;">🏆 <strong style="color:var(--or);">But du jeu</strong><br>Survivre jusqu'à la Manche 8 et devenir le dernier Chevalier debout.</div>
+    <div style="font-family:'Raleway',sans-serif;font-size:13px;color:var(--blanc);line-height:1.6;padding:12px;background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:6px;">📜 <strong style="color:var(--or);">Déroulement</strong><br>8 manches de 8 questions. À chaque fin de manche, le ou les joueurs en bas du classement sont éliminés jusqu'à ce qu'il reste 2 joueurs.</div>
+    <div style="font-family:'Raleway',sans-serif;font-size:13px;color:var(--blanc);line-height:1.6;padding:12px;background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:6px;">⚡ <strong style="color:var(--or);">Points</strong><br>1 point par bonne réponse. Les 3 premiers à répondre correctement gagnent +2 points bonus en plus !</div>
+    <div style="font-family:'Raleway',sans-serif;font-size:13px;color:var(--blanc);line-height:1.6;padding:12px;background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:6px;">💀 <strong style="color:var(--or);">Élimination</strong><br>Les derniers du classement à chaque fin de manche sont éliminés. Ils peuvent laisser un dernier message avant de passer en spectateur.</div>
+    <div style="font-family:'Raleway',sans-serif;font-size:13px;color:var(--blanc);line-height:1.6;padding:12px;background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:6px;">⚔️ <strong style="color:var(--or);">Finale</strong><br>Les 2 derniers survivants s'affrontent en Manche 8 pour la victoire ultime.</div>
+  </div>
+  <div class="ornemental-line" style="width:100%;max-width:400px;margin-top:16px;"><span>✦</span></div>
+  <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--or-fonce);margin-top:8px;text-align:center;">Que le meilleur Chevalier gagne !</div>
+</div>
+
+<!-- ÉCRAN COMPTE À REBOURS -->
+<div class="screen" id="screen-countdown">
+  <div id="countdown-number"></div>
+</div>
+
 <!-- ÉCRAN 1 : LOBBY -->
 <div class="screen active" id="screen-lobby">
   <canvas id="lobby-canvas"></canvas>
@@ -499,7 +526,7 @@
     <span id="player-count-num">0</span>
   </div>
   <div class="waiting-status">
-    En attente du Maître du Jeu
+    Inezawa prépare quelque chose. Priez.
     <br><br>
     <span class="pulse-dot"></span>
     <span class="pulse-dot"></span>
@@ -540,25 +567,28 @@
   <div style="font-size:60px;">💀</div>
   <div class="eliminated-title">ÉLIMINÉ</div>
   <div class="eliminated-score" id="elim-score">Score final : 0 pts</div>
-  <div class="ornemental-line" style="width:100%;max-width:340px;margin:20px auto;"><span>✦</span></div>
+  <div class="ornemental-line" style="width:100%;max-width:340px;margin:16px auto;"><span>✦</span></div>
+  <div style="font-family:'Raleway',sans-serif;font-size:14px;color:rgba(255,255,255,0.7);text-align:center;padding:0 24px;line-height:1.7;max-width:380px;font-style:italic;">
+    Tu es éliminé(e), Chevalier. Mais ton Cosmos ne s'éteint pas ici — Inezawa te remercie du fond du cœur pour ta participation et t'invite à rester parmi nous en tant que témoin de cette grande bataille.
+  </div>
+  <div class="ornemental-line" style="width:100%;max-width:340px;margin:16px auto;"><span>✦</span></div>
   <div id="last-word-container" style="width:100%;max-width:340px;">
-    <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--or-fonce);text-align:center;margin-bottom:12px;">TON DERNIER MOT...</div>
-    <textarea id="last-word-input" style="width:100%;background:rgba(201,168,76,0.05);border:1px solid var(--or-fonce);border-radius:4px;padding:14px;color:var(--or-clair);font-family:'Raleway',sans-serif;font-size:15px;resize:none;height:100px;outline:none;" placeholder="Laisse un message à la légion..." maxlength="150"></textarea>
+    <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--or-fonce);text-align:center;margin-bottom:10px;">TON DERNIER MOT...</div>
+    <textarea id="last-word-input" style="width:100%;background:rgba(201,168,76,0.05);border:1px solid var(--or-fonce);border-radius:4px;padding:12px;color:var(--or-clair);font-family:'Raleway',sans-serif;font-size:14px;resize:none;height:90px;outline:none;" placeholder="Laisse un message à la légion..." maxlength="150"></textarea>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
       <div id="last-word-timer" style="font-family:'Cinzel',serif;font-size:13px;color:var(--or-fonce);">60s</div>
       <button id="btn-send-last-word" style="padding:10px 20px;background:linear-gradient(135deg,var(--or-fonce),var(--or));border:none;border-radius:4px;color:var(--noir);font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;cursor:pointer;">ENVOYER ⚔</button>
     </div>
   </div>
-  <div id="last-word-sent" style="display:none;text-align:center;">
+  <div id="last-word-sent" style="display:none;text-align:center;margin-top:16px;">
     <div class="spectator-badge">👁 Mode Spectateur Actif</div>
-    <div style="margin-top:16px;font-family:'Raleway',sans-serif;font-size:13px;color:rgba(255,255,255,0.4);">Tu peux continuer à suivre la partie...</div>
   </div>
 </div>
 
 <!-- ÉCRAN ATTENTE VERDICT -->
 <div class="screen" id="screen-verdict">
   <div style="font-size:50px;margin-bottom:20px;">⚔</div>
-  <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(18px,5vw,28px);color:var(--or);text-shadow:var(--glow);text-align:center;line-height:1.4;">Le Maître du Jeu<br>prononce son verdict</div>
+  <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(18px,5vw,26px);color:var(--or);text-shadow:var(--glow);text-align:center;line-height:1.4;">Le verdict tombe...</div>
   <div class="ornemental-line" style="width:100%;max-width:300px;margin:20px auto;"><span>✦</span></div>
   <div style="display:flex;gap:6px;justify-content:center;">
     <span class="pulse-dot"></span><span class="pulse-dot"></span><span class="pulse-dot"></span>
@@ -578,7 +608,11 @@
 <div class="screen" id="screen-scores">
   <div class="scores-title" id="scores-round-name">Classement</div>
   <div class="ornemental-line"><span>✦</span></div>
-  <div id="scores-list" style="width:100%;max-width:400px;margin:0 auto;overflow-y:auto;"></div>
+  <div id="scores-list" style="width:100%;max-width:400px;margin:0 auto;overflow-y:auto;max-height:50vh;"></div>
+  <div id="answers-recap" style="display:none;width:100%;max-width:400px;margin:16px auto 0;">
+    <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;color:var(--or-fonce);text-align:center;margin-bottom:10px;">— BONNES RÉPONSES —</div>
+    <div id="answers-recap-list"></div>
+  </div>
 </div>
 
 <!-- ÉCRAN 7 : GAME OVER -->
@@ -704,11 +738,20 @@ function handleMessage(msg) {
       break;
 
     case 'reveal_answer':
-      revealAnswer(msg.correctIndex);
+      // On ne révèle rien visuellement pendant la partie
+      document.querySelectorAll('.choice-btn').forEach(b => b.classList.add('disabled'));
       break;
 
     case 'round_end':
       setTimeout(() => showScores(msg), 1500);
+      break;
+
+    case 'show_rules':
+      showScreen('screen-rules');
+      break;
+
+    case 'countdown':
+      showCountdown(msg.value);
       break;
 
     case 'eliminated':
@@ -721,11 +764,9 @@ function handleMessage(msg) {
         document.getElementById('last-word-sent').style.display = 'none';
         showScreen('screen-eliminated');
         startLastWordTimer();
+      } else {
+        showScreen('screen-verdict');
       }
-      break;
-
-    case 'verdict_time':
-      if (!isEliminated) showScreen('screen-verdict');
       break;
 
     case 'farewell_message':
@@ -845,34 +886,95 @@ function updateTimer(val) {
 }
 
 function revealAnswer(correctIndex) {
-  document.querySelectorAll('.choice-btn').forEach((b, i) => {
-    b.classList.add('disabled');
-    if (i === correctIndex) b.classList.add('correct');
-    else if (b.classList.contains('selected')) b.classList.add('wrong');
-  });
-  const myBtn = document.querySelector(`.choice-btn[data-index="${correctIndex}"]`);
-  if (myBtn) {
-    const wasSelected = document.querySelector('.choice-btn.selected');
-    if (wasSelected && wasSelected.dataset.index == correctIndex) playSuccess();
-  }
+  // Rien pendant la partie, suspense jusqu'au classement
+  document.querySelectorAll('.choice-btn').forEach(b => b.classList.add('disabled'));
 }
+
+function showCountdown(val) {
+  document.getElementById('countdown-number').textContent = val;
+  showScreen('screen-countdown');
+  playBip(val === 1 ? 880 : val === 2 ? 660 : 440, 0.2, 'square');
+}
+
+function playSadMusic() {
+  try {
+    const ctx = getAudio();
+    [392, 349, 330, 294, 262, 247, 220].forEach((f, i) => {
+      setTimeout(() => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'triangle'; osc.frequency.value = f;
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+        osc.start(); osc.stop(ctx.currentTime + 0.7);
+      }, i * 380);
+    });
+  } catch(e) {}
+}
+
+function playTop3Sound(rank) {
+  if (rank === 1) [784, 880, 1047, 1319].forEach((f, i) => setTimeout(() => playBip(f, 0.2, 'triangle'), i * 100));
+  else [659, 784, 880].forEach((f, i) => setTimeout(() => playBip(f, 0.15, 'triangle'), i * 100));
+}
+
+let lastWordTimerInterval = null;
+function startLastWordTimer() {
+  let t = 60;
+  document.getElementById('last-word-timer').textContent = t + 's';
+  if (lastWordTimerInterval) clearInterval(lastWordTimerInterval);
+  lastWordTimerInterval = setInterval(() => {
+    t--;
+    document.getElementById('last-word-timer').textContent = t + 's';
+    if (t <= 0) { clearInterval(lastWordTimerInterval); sendLastWord(true); }
+  }, 1000);
+}
+
+function sendLastWord(auto = false) {
+  if (lastWordTimerInterval) clearInterval(lastWordTimerInterval);
+  const msg = document.getElementById('last-word-input').value.trim();
+  ws.send(JSON.stringify({ type: 'last_word', message: msg || '...' }));
+  document.getElementById('last-word-container').style.display = 'none';
+  document.getElementById('last-word-sent').style.display = 'block';
+}
+
+document.getElementById('btn-send-last-word').addEventListener('click', () => sendLastWord(false));
 
 // ── Scores ──────────────────────────────────────────────────────────────────
 function showScores(msg) {
   document.getElementById('scores-round-name').textContent = `Fin de ${msg.roundName}`;
   const list = document.getElementById('scores-list');
   list.innerHTML = '';
-  const letters = ['🥇','🥈','🥉'];
+  const medals = ['🥇','🥈','🥉'];
   msg.scores.forEach((p, i) => {
     const div = document.createElement('div');
     div.className = 'score-item' + (i === 0 ? ' top1' : '') + (p.eliminated ? ' eliminated-score-item' : '');
+    const bonusStr = p.lastBonus > 0 ? `<span style="font-size:11px;color:#4CAF50;margin-left:4px;">+${p.lastBonus} bonus</span>` : '';
     div.innerHTML = `
-      <span class="score-rank ${i===0?'gold':''}">${letters[i] || (i+1)}</span>
+      <span class="score-rank ${i===0?'gold':''}">${medals[i] || (i+1)}</span>
       <span class="score-pseudo">${p.pseudo}${p.eliminated ? ' 💀' : ''}</span>
-      <span class="score-points">${p.score.toLocaleString()}</span>
+      <span class="score-points">${p.score}pts${bonusStr}</span>
     `;
     list.appendChild(div);
+    if (p.id === myId && i < 3) setTimeout(() => playTop3Sound(i + 1), 600);
   });
+
+  // Récap bonnes réponses
+  if (msg.questionsRecap && msg.questionsRecap.length > 0) {
+    document.getElementById('answers-recap').style.display = 'block';
+    const recapList = document.getElementById('answers-recap-list');
+    recapList.innerHTML = '';
+    msg.questionsRecap.forEach((q, i) => {
+      const div = document.createElement('div');
+      div.style.cssText = 'padding:8px 10px;margin-bottom:6px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);border-radius:4px;';
+      div.innerHTML = `
+        <div style="font-family:'Raleway',sans-serif;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px;">Q${i+1} — ${q.question}</div>
+        <div style="font-family:'Cinzel',serif;font-size:12px;color:#4CAF50;">✅ ${q.correctAnswer}</div>
+      `;
+      recapList.appendChild(div);
+    });
+  }
+
   showScreen('screen-scores');
 }
 
@@ -881,64 +983,20 @@ function showGameOver(msg) {
   document.getElementById('winner-name').textContent = msg.winner;
   const list = document.getElementById('final-scores-list');
   list.innerHTML = '';
-  const letters = ['🥇','🥈','🥉'];
+  const medals = ['🥇','🥈','🥉'];
   msg.scores.forEach((p, i) => {
     const div = document.createElement('div');
     div.className = 'score-item' + (i === 0 ? ' top1' : '');
     div.innerHTML = `
-      <span class="score-rank ${i===0?'gold':''}">${letters[i] || (i+1)}</span>
+      <span class="score-rank ${i===0?'gold':''}">${medals[i] || (i+1)}</span>
       <span class="score-pseudo">${p.pseudo}</span>
-      <span class="score-points">${p.score.toLocaleString()}</span>
+      <span class="score-points">${p.score} pts</span>
     `;
     list.appendChild(div);
   });
   playSuccess();
   showScreen('screen-gameover');
 }
-
-function playSadMusic() {
-  try {
-    const ctx = getAudio();
-    const notes = [392, 349, 330, 294, 262, 247, 220];
-    notes.forEach((f, i) => {
-      setTimeout(() => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain); gain.connect(ctx.destination);
-        osc.type = 'triangle';
-        osc.frequency.value = f;
-        gain.gain.setValueAtTime(0.2, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
-        osc.start(); osc.stop(ctx.currentTime + 0.8);
-      }, i * 400);
-    });
-  } catch(e) {}
-}
-
-let lastWordTimerInterval = null;
-function startLastWordTimer() {
-  let timeLeft = 60;
-  document.getElementById('last-word-timer').textContent = timeLeft + 's';
-  if (lastWordTimerInterval) clearInterval(lastWordTimerInterval);
-  lastWordTimerInterval = setInterval(() => {
-    timeLeft--;
-    document.getElementById('last-word-timer').textContent = timeLeft + 's';
-    if (timeLeft <= 0) {
-      clearInterval(lastWordTimerInterval);
-      sendLastWord(true);
-    }
-  }, 1000);
-}
-
-function sendLastWord(auto = false) {
-  if (lastWordTimerInterval) clearInterval(lastWordTimerInterval);
-  const msg = document.getElementById('last-word-input').value.trim();
-  ws.send(JSON.stringify({ type: 'last_word', message: auto && !msg ? '...' : (msg || '...') }));
-  document.getElementById('last-word-container').style.display = 'none';
-  document.getElementById('last-word-sent').style.display = 'block';
-}
-
-document.getElementById('btn-send-last-word').addEventListener('click', () => sendLastWord(false));
 
 // ── Join ────────────────────────────────────────────────────────────────────
 document.getElementById('btn-join').addEventListener('click', () => {
@@ -959,59 +1017,38 @@ function startConstellation() {
   function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
   resize();
   window.addEventListener('resize', resize);
-
-  const STAR_COUNT = 80;
-  const stars = Array.from({ length: STAR_COUNT }, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    r: Math.random() * 1.5 + 0.3,
-    alpha: Math.random(),
-    speed: Math.random() * 0.004 + 0.002,
-    phase: Math.random() * Math.PI * 2,
+  const stars = Array.from({ length: 80 }, () => ({
+    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+    r: Math.random() * 1.5 + 0.3, phase: Math.random() * Math.PI * 2,
+    speed: Math.random() * 0.005 + 0.002,
   }));
-
-  // Liens de constellation fixes entre étoiles proches
   const links = [];
-  for (let i = 0; i < stars.length; i++) {
+  for (let i = 0; i < stars.length; i++)
     for (let j = i + 1; j < stars.length; j++) {
-      const dx = stars[i].x - stars[j].x;
-      const dy = stars[i].y - stars[j].y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 120) links.push([i, j, dist]);
+      const d = Math.hypot(stars[i].x - stars[j].x, stars[i].y - stars[j].y);
+      if (d < 110) links.push([i, j, d]);
     }
-  }
-
-  let raf;
   function draw(t) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // Lignes constellation
-    links.forEach(([i, j, dist]) => {
-      const alpha = (1 - dist / 120) * 0.18;
-      ctx.strokeStyle = `rgba(201,168,76,${alpha})`;
+    links.forEach(([i, j, d]) => {
+      ctx.strokeStyle = `rgba(201,168,76,${(1 - d / 110) * 0.15})`;
       ctx.lineWidth = 0.5;
-      ctx.beginPath();
-      ctx.moveTo(stars[i].x, stars[i].y);
-      ctx.lineTo(stars[j].x, stars[j].y);
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(stars[i].x, stars[i].y); ctx.lineTo(stars[j].x, stars[j].y); ctx.stroke();
     });
-    // Étoiles
     stars.forEach(s => {
-      const a = 0.4 + 0.5 * Math.abs(Math.sin(t * s.speed + s.phase));
-      ctx.globalAlpha = a;
-      ctx.fillStyle = Math.random() > 0.97 ? '#FFFFFF' : '#C9A84C';
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.globalAlpha = 0.4 + 0.5 * Math.abs(Math.sin(t * 0.001 * s.speed * 200 + s.phase));
+      ctx.fillStyle = '#C9A84C';
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
     });
     ctx.globalAlpha = 1;
-    raf = requestAnimationFrame(draw);
+    requestAnimationFrame(draw);
   }
-  draw(0);
+  requestAnimationFrame(draw);
 }
-startConstellation();
 
 // ── Init ────────────────────────────────────────────────────────────────────
 connect();
+startConstellation();
 </script>
 </body>
 </html>
