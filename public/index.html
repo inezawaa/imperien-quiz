@@ -946,40 +946,104 @@ function showScores(msg) {
   document.getElementById('scores-round-name').textContent = `Fin de ${msg.roundName}`;
   const list = document.getElementById('scores-list');
   list.innerHTML = '';
+  document.getElementById('answers-recap').style.display = 'none';
+  showScreen('screen-scores');
+
   const medals = ['🥇','🥈','🥉'];
-  msg.scores.forEach((p, i) => {
-    const div = document.createElement('div');
-    div.className = 'score-item' + (i === 0 ? ' top1' : '') + (p.eliminated ? ' eliminated-score-item' : '');
-    const bonusStr = p.lastBonus > 0 ? `<span style="font-size:11px;color:#4CAF50;margin-left:4px;">+${p.lastBonus} bonus</span>` : '';
-    div.innerHTML = `
-      <span class="score-rank ${i===0?'gold':''}">${medals[i] || (i+1)}</span>
-      <span class="score-pseudo">${p.pseudo}${p.eliminated ? ' 💀' : ''}</span>
-      <span class="score-points">${p.score}pts${bonusStr}</span>
-    `;
-    list.appendChild(div);
-    if (p.id === myId && i < 3) setTimeout(() => playTop3Sound(i + 1), 600);
+  const scores = msg.scores || [];
+  // Animation du dernier au premier
+  const reversed = [...scores].reverse();
+  reversed.forEach((p, revIdx) => {
+    const realIdx = scores.length - 1 - revIdx;
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.className = 'score-item' + (realIdx === 0 ? ' top1' : '') + (p.eliminated ? ' eliminated-score-item' : '');
+      div.style.cssText = 'opacity:0;transform:translateY(20px);transition:all 0.4s ease;';
+      const bonusStr = p.lastBonus > 0 ? `<span style="font-size:11px;color:#4CAF50;margin-left:4px;">+${p.lastBonus} bonus</span>` : '';
+      div.innerHTML = `
+        <span class="score-rank ${realIdx===0?'gold':''}">${medals[realIdx] || (realIdx+1)}</span>
+        <span class="score-pseudo">${p.pseudo}${p.eliminated ? ' 💀' : ''}</span>
+        <span class="score-points">${p.score}pts${bonusStr}</span>
+      `;
+      // Insérer en haut de la liste
+      list.insertBefore(div, list.firstChild);
+      requestAnimationFrame(() => {
+        div.style.opacity = '1';
+        div.style.transform = 'translateY(0)';
+      });
+      playBip(realIdx === 0 ? 880 : 440, 0.08, 'sine');
+      if (p.id === myId && realIdx < 3) setTimeout(() => playTop3Sound(realIdx + 1), 300);
+    }, revIdx * 400);
   });
 
-  // Récap bonnes réponses
+  // Récap bonnes réponses après l'animation
+  const totalDelay = reversed.length * 400 + 600;
   if (msg.questionsRecap && msg.questionsRecap.length > 0) {
-    document.getElementById('answers-recap').style.display = 'block';
-    const recapList = document.getElementById('answers-recap-list');
-    recapList.innerHTML = '';
-    msg.questionsRecap.forEach((q, i) => {
-      const div = document.createElement('div');
-      div.style.cssText = 'padding:8px 10px;margin-bottom:6px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);border-radius:4px;';
-      div.innerHTML = `
-        <div style="font-family:'Raleway',sans-serif;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px;">Q${i+1} — ${q.question}</div>
-        <div style="font-family:'Cinzel',serif;font-size:12px;color:#4CAF50;">✅ ${q.correctAnswer}</div>
-      `;
-      recapList.appendChild(div);
-    });
+    setTimeout(() => {
+      document.getElementById('answers-recap').style.display = 'block';
+      const recapList = document.getElementById('answers-recap-list');
+      recapList.innerHTML = '';
+      msg.questionsRecap.forEach((q, i) => {
+        const div = document.createElement('div');
+        div.style.cssText = 'padding:8px 10px;margin-bottom:6px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);border-radius:4px;';
+        div.innerHTML = `
+          <div style="font-family:'Raleway',sans-serif;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px;">Q${i+1} — ${q.question}</div>
+          <div style="font-family:'Cinzel',serif;font-size:12px;color:#4CAF50;">✅ ${q.correctAnswer}</div>
+        `;
+        recapList.appendChild(div);
+      });
+    }, totalDelay);
   }
-
-  showScreen('screen-scores');
 }
 
-// ── Game Over ────────────────────────────────────────────────────────────────
+// ── Musique ambiante japonaise douce ────────────────────────────────────────
+let musicStarted = false;
+function startAmbientMusic() {
+  if (musicStarted) return;
+  musicStarted = true;
+  try {
+    const ctx = getAudio();
+    // Gamme pentatonique japonaise mineure
+    const notes = [220, 246.94, 261.63, 293.66, 329.63, 349.23, 392, 440];
+    const mel =   [4,3,2,1,0,1,2,3,4,5,4,3,2,4,3,1,0,2,1,0,3,2,1,2,3,4];
+    const durs =  [1,0.5,0.5,1,0.75,0.5,0.5,0.75,1,0.5,0.75,0.5,1,0.5,0.5,0.75,1,0.5,0.75,1,0.5,0.5,0.75,0.5,0.5,1.5];
+    const VOL = 0.018; // très faible
+
+    function playLoop(startTime) {
+      let t = startTime;
+      mel.forEach((ni, i) => {
+        const freq = notes[ni];
+        const dur = durs[i];
+        // Shakuhachi simulé (sine + triangle doux)
+        ['sine','triangle'].forEach((type, ti) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.type = type;
+          osc.frequency.value = freq * (ti === 1 ? 2 : 1);
+          gain.gain.setValueAtTime(0, t);
+          gain.gain.linearRampToValueAtTime(VOL * (ti === 1 ? 0.3 : 1), t + 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.85);
+          osc.start(t); osc.stop(t + dur);
+        });
+        t += dur;
+      });
+      const total = durs.reduce((a,b) => a+b, 0);
+      setTimeout(() => playLoop(ctx.currentTime + 0.1), (total - 0.3) * 1000);
+    }
+
+    // Bourdon très doux
+    const drone = ctx.createOscillator();
+    const dGain = ctx.createGain();
+    drone.connect(dGain); dGain.connect(ctx.destination);
+    drone.type = 'sine';
+    drone.frequency.value = 55;
+    dGain.gain.value = 0.008;
+    drone.start();
+
+    playLoop(ctx.currentTime + 0.2);
+  } catch(e) {}
+}
 function showGameOver(msg) {
   document.getElementById('winner-name').textContent = msg.winner;
   const list = document.getElementById('final-scores-list');
@@ -1010,66 +1074,6 @@ document.getElementById('btn-join').addEventListener('click', () => {
 document.getElementById('pseudo-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('btn-join').click();
 });
-
-// ── Musique japonaise ambiante ──────────────────────────────────────────────
-let musicStarted = false;
-function startAmbientMusic() {
-  if (musicStarted) return;
-  musicStarted = true;
-  try {
-    const ctx = getAudio();
-    // Mélodie pentatonique japonaise (Do Ré Mi Sol La)
-    const scale = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99, 880.00];
-    const melody = [4,2,1,0,2,4,6,4,2,4,2,0,1,2,4,2,6,4,2,1,0,2,1,0];
-    const durations = [0.6,0.4,0.4,0.8,0.4,0.6,0.8,0.4,0.4,0.6,0.4,0.8,0.4,0.4,0.6,0.8,0.6,0.4,0.4,0.4,0.8,0.4,0.4,1.2];
-
-    function playMelody(startTime) {
-      let t = startTime;
-      melody.forEach((noteIdx, i) => {
-        const freq = scale[noteIdx];
-        const dur = durations[i];
-
-        // Note principale (koto simulé)
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain); gain.connect(ctx.destination);
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, t);
-        gain.gain.setValueAtTime(0, t);
-        gain.gain.linearRampToValueAtTime(0.04, t + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.9);
-        osc.start(t); osc.stop(t + dur);
-
-        // Harmonique douce
-        const osc2 = ctx.createOscillator();
-        const gain2 = ctx.createGain();
-        osc2.connect(gain2); gain2.connect(ctx.destination);
-        osc2.type = 'sine';
-        osc2.frequency.setValueAtTime(freq * 2, t);
-        gain2.gain.setValueAtTime(0, t);
-        gain2.gain.linearRampToValueAtTime(0.015, t + 0.03);
-        gain2.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.7);
-        osc2.start(t); osc2.stop(t + dur);
-
-        t += dur;
-      });
-      // Boucle
-      const totalDur = durations.reduce((a, b) => a + b, 0);
-      setTimeout(() => playMelody(ctx.currentTime), (totalDur - 0.5) * 1000);
-    }
-
-    // Bourdon grave doux (drone)
-    const drone = ctx.createOscillator();
-    const droneGain = ctx.createGain();
-    drone.connect(droneGain); droneGain.connect(ctx.destination);
-    drone.type = 'sine';
-    drone.frequency.value = 65.41; // Do grave
-    droneGain.gain.value = 0.018;
-    drone.start();
-
-    playMelody(ctx.currentTime + 0.1);
-  } catch(e) {}
-}
 
 // ── Constellation Lobby ─────────────────────────────────────────────────────
 function startConstellation() {
