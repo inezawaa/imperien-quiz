@@ -348,7 +348,14 @@ function connect() {
   ws.onclose = () => setTimeout(connect, 2000);
 }
 
-function send(obj) { ws.send(JSON.stringify(obj)); }
+function send(obj) {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(obj));
+  } else {
+    // Attendre la connexion puis envoyer
+    ws.addEventListener('open', () => ws.send(JSON.stringify(obj)), { once: true });
+  }
+}
 
 function notify(text) {
   const n = document.getElementById('notif');
