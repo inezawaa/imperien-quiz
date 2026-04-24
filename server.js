@@ -89,14 +89,15 @@ function startTimer() {
 function revealAnswer() {
   const q = getQuestion();
   if (!q) return;
-  // Marquer les non-répondants
   Object.values(gameState.players).forEach(p => {
     if (!p.eliminated && !p.answered) {
       p.answer = null;
-      p.score += 0;
+      p.lastBonus = 0;
     }
   });
   broadcast({ type: 'reveal_answer', correctIndex: q.correct, players: gameState.players });
+  // Passage automatique à la question suivante après 3 secondes
+  setTimeout(() => nextQuestion(), 3000);
 }
 
 function nextQuestion() {
