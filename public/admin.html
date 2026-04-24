@@ -383,15 +383,6 @@ function handleMsg(msg) {
     case 'questions_loaded':
       notify(`✅ ${msg.rounds} manche(s) chargée(s) !`);
       break;
-    case 'answer_count':
-      answeredCount = msg.answered;
-      activeCount = msg.total;
-      document.getElementById('stat-answered').textContent = answeredCount;
-      const pct = activeCount > 0 ? (answeredCount / activeCount * 100) : 0;
-      document.getElementById('answer-prog-bar').style.width = pct + '%';
-      document.getElementById('answer-prog-text').textContent = `${answeredCount} / ${activeCount}`;
-      document.getElementById('answer-progress-card').style.display = 'block';
-      break;
     case 'timer':
       document.getElementById('admin-timer').textContent = msg.value;
       if (msg.value <= 10) document.getElementById('admin-timer').style.color = '#FF4444';
@@ -408,8 +399,8 @@ function handleMsg(msg) {
       answeredCount = msg.answered;
       activeCount = msg.total;
       document.getElementById('stat-answered').textContent = answeredCount;
-      const pct = activeCount > 0 ? (answeredCount / activeCount * 100) : 0;
-      document.getElementById('answer-prog-bar').style.width = pct + '%';
+      const answerPct = activeCount > 0 ? (answeredCount / activeCount * 100) : 0;
+      document.getElementById('answer-prog-bar').style.width = answerPct + '%';
       document.getElementById('answer-prog-text').textContent = `${answeredCount} / ${activeCount}`;
       document.getElementById('answer-progress-card').style.display = 'block';
       if (msg.choiceVotes) { choiceVotes = msg.choiceVotes; updateChoiceBars(); }
