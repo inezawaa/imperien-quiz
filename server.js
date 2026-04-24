@@ -135,10 +135,13 @@ function sendQuestion() {
 function endRound() {
   clearInterval(timerInterval);
   gameState.phase = 'round_end';
+  // Tous les joueurs triés par score, actifs d'abord
   const sorted = Object.values(gameState.players)
-    .filter(p => !p.eliminated)
-    .sort((a, b) => b.score - a.score);
-  // Récap des bonnes réponses de la manche
+    .sort((a, b) => {
+      if (a.eliminated && !b.eliminated) return 1;
+      if (!a.eliminated && b.eliminated) return -1;
+      return b.score - a.score;
+    });
   const round = gameState.questions[gameState.currentRound];
   const questionsRecap = round ? round.map(q => ({
     question: q.question,
