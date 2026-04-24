@@ -220,7 +220,7 @@ wss.on('connection', (ws) => {
         broadcast({ type: 'countdown', value: count });
         const cdInterval = setInterval(() => {
           count--;
-          if (count <= 0) { clearInterval(cdInterval); sendQuestion(); }
+          if (count <= 0) { clearInterval(cdInterval); setTimeout(sendQuestion, 800); }
           else broadcast({ type: 'countdown', value: count });
         }, 1000);
         break;
