@@ -576,7 +576,7 @@
     <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--or-fonce);text-align:center;margin-bottom:10px;">TON DERNIER MOT...</div>
     <textarea id="last-word-input" style="width:100%;background:rgba(201,168,76,0.05);border:1px solid var(--or-fonce);border-radius:4px;padding:12px;color:var(--or-clair);font-family:'Raleway',sans-serif;font-size:14px;resize:none;height:90px;outline:none;" placeholder="Laisse un message à la légion..." maxlength="150"></textarea>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-      <div id="last-word-timer" style="font-family:'Cinzel',serif;font-size:13px;color:var(--or-fonce);">60s</div>
+      <div id="last-word-timer" style="font-family:'Cinzel',serif;font-size:13px;color:var(--or-fonce);">45s</div>
       <button id="btn-send-last-word" style="padding:10px 20px;background:linear-gradient(135deg,var(--or-fonce),var(--or));border:none;border-radius:4px;color:var(--noir);font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;cursor:pointer;">ENVOYER ⚔</button>
     </div>
   </div>
@@ -752,7 +752,7 @@ function handleMessage(msg) {
       break;
 
     case 'countdown':
-      showCountdown(msg.value);
+      showCountdownOverlay(msg.value);
       break;
 
     case 'eliminated':
@@ -891,10 +891,19 @@ function revealAnswer(correctIndex) {
   document.querySelectorAll('.choice-btn').forEach(b => b.classList.add('disabled'));
 }
 
-function showCountdown(val) {
-  document.getElementById('countdown-number').textContent = val;
-  showScreen('screen-countdown');
+function showCountdownOverlay(val) {
+  let overlay = document.getElementById('countdown-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'countdown-overlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;z-index:200;background:rgba(0,0,0,0.7);';
+    document.body.appendChild(overlay);
+  }
+  overlay.innerHTML = `<div style="font-family:'Cinzel Decorative',serif;font-size:clamp(100px,30vw,180px);color:var(--or);text-shadow:0 0 60px rgba(201,168,76,0.8);">${val}</div>`;
+  overlay.style.display = 'flex';
   playBip(val === 1 ? 880 : val === 2 ? 660 : 440, 0.2, 'square');
+  // Cacher après 0.8s
+  setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 800);
 }
 
 function playSadMusic() {
@@ -921,7 +930,7 @@ function playTop3Sound(rank) {
 
 let lastWordTimerInterval = null;
 function startLastWordTimer() {
-  let t = 60;
+  let t = 45;
   document.getElementById('last-word-timer').textContent = t + 's';
   if (lastWordTimerInterval) clearInterval(lastWordTimerInterval);
   lastWordTimerInterval = setInterval(() => {
@@ -1114,7 +1123,7 @@ function startConstellation() {
 
 // ── Init ────────────────────────────────────────────────────────────────────
 connect();
-startConstellation();
+window.addEventListener('load', () => startConstellation());
 </script>
 </body>
 </html>
