@@ -138,7 +138,13 @@ function endRound() {
   const sorted = Object.values(gameState.players)
     .filter(p => !p.eliminated)
     .sort((a, b) => b.score - a.score);
-  broadcast({ type: 'round_end', scores: sorted, roundName: gameState.roundName });
+  // Récap des bonnes réponses de la manche
+  const round = gameState.questions[gameState.currentRound];
+  const questionsRecap = round ? round.map(q => ({
+    question: q.question,
+    correctAnswer: q.choices[q.correct]
+  })) : [];
+  broadcast({ type: 'round_end', scores: sorted, roundName: gameState.roundName, questionsRecap });
   broadcastGameState();
 }
 
@@ -210,7 +216,20 @@ wss.on('connection', (ws) => {
       // ── Admin : lancer les questions après l'intro ──────────────────────────
       case 'launch_questions': {
         if (!ws.isAdmin) return;
-        sendQuestion();
+        let count = 3;
+        broadcast({ type: 'countdown', value: count });
+        const cdInterval = setInterval(() => {
+          count--;
+          if (count <= 0) { clearInterval(cdInterval); sendQuestion(); }
+          else broadcast({ type: 'countdown', value: count });
+        }, 1000);
+        break;
+      }
+
+      // ── Admin : afficher les règles ─────────────────────────────────────────
+      case 'show_rules': {
+        if (!ws.isAdmin) return;
+        broadcast({ type: 'show_rules' });
         break;
       }
 
@@ -243,16 +262,16 @@ wss.on('connection', (ws) => {
         const p = gameState.players[msg.playerId];
         if (p) {
           p.eliminated = true;
-          // Envoyer score final au joueur éliminé
+          // Envoyer score au joueur éliminé
           wss.clients.forEach(client => {
             if (client.readyState === WebSocket.OPEN && client.playerId === msg.playerId) {
               client.send(JSON.stringify({ type: 'eliminated', playerId: msg.playerId, pseudo: p.pseudo, score: p.score }));
             }
           });
-          // Dire aux autres joueurs de passer en écran verdict
+          // Autres joueurs voient l'écran verdict
           wss.clients.forEach(client => {
             if (client.readyState === WebSocket.OPEN && client.playerId && client.playerId !== msg.playerId) {
-              client.send(JSON.stringify({ type: 'verdict_time' }));
+              client.send(JSON.stringify({ type: 'eliminated', playerId: msg.playerId, pseudo: p.pseudo, score: p.score }));
             }
           });
           broadcastGameState();
@@ -265,14 +284,7 @@ wss.on('connection', (ws) => {
         const p = gameState.players[ws.playerId];
         if (!p) return;
         const message = (msg.message || '...').slice(0, 150);
-        // Diffuser le message à tous
         broadcast({ type: 'farewell_message', pseudo: p.pseudo, message });
-        // Notifier l'admin
-        wss.clients.forEach(client => {
-          if (client.readyState === WebSocket.OPEN && client.isAdmin) {
-            client.send(JSON.stringify({ type: 'farewell_message', pseudo: p.pseudo, message }));
-          }
-        });
         break;
       }
 
@@ -326,31 +338,30 @@ wss.on('connection', (ws) => {
         const q = getQuestion();
         if (!q) return;
         const timeUsed = (Date.now() - timerStart) / 1000;
-        const timeLeft = Math.max(0, 30 - timeUsed);
         p.answered = true;
         p.answer = msg.answerIndex;
         p.answerTime = timeUsed;
         if (msg.answerIndex === q.correct) {
-          // Points : 500 base + jusqu'à 500 bonus selon vitesse
-          const bonus = Math.round((timeLeft / 30) * 500);
-          p.score += 500 + bonus;
+          // Compter combien ont déjà répondu correctement
+          const correctBefore = Object.values(gameState.players).filter(p2 =>
+            !p2.eliminated && p2.answered && p2.answer === q.correct && p2.id !== p.id
+          ).length;
+          const bonus = correctBefore < 3 ? 2 : 0;
+          p.score += 1 + bonus;
+          p.lastBonus = bonus;
+        } else {
+          p.lastBonus = 0;
         }
         ws.send(JSON.stringify({ type: 'answer_received', answerIndex: msg.answerIndex }));
-        // Dire à l'admin combien ont répondu
+        // Stats pour l'admin
         const answered = Object.values(gameState.players).filter(p2 => !p2.eliminated && p2.answered).length;
         const active = Object.values(gameState.players).filter(p2 => !p2.eliminated).length;
-        // Compter les votes par choix
-        const q = getQuestion();
-        const choiceVotes = q ? new Array(q.choices.length).fill(0) : [];
-        Object.values(gameState.players).filter(p2 => !p2.eliminated && p2.answered && p2.answer !== null).forEach(p2 => {
-          if (choiceVotes[p2.answer] !== undefined) choiceVotes[p2.answer]++;
-        });
+        const choiceVotes = new Array(q.choices.length).fill(0);
+        Object.values(gameState.players).filter(p2 => !p2.eliminated && p2.answered && p2.answer !== null)
+          .forEach(p2 => { if (choiceVotes[p2.answer] !== undefined) choiceVotes[p2.answer]++; });
         broadcast({ type: 'answer_count', answered, total: active, choiceVotes });
         // Auto-reveal si tout le monde a répondu
-        if (answered >= active) {
-          clearInterval(timerInterval);
-          revealAnswer();
-        }
+        if (answered >= active) { clearInterval(timerInterval); revealAnswer(); }
         break;
       }
     }
