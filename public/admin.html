@@ -189,31 +189,12 @@
   .progress-bar { height: 100%; background: linear-gradient(90deg, var(--or-fonce), var(--or)); transition: width 0.3s; width: 0%; }
   .progress-text { font-family: 'Cinzel', serif; font-size: 13px; color: var(--or); min-width: 60px; text-align: right; }
 
-  .choice-bar-row {
-    display: flex; align-items: center; gap: 10px;
-    margin-bottom: 10px;
-  }
-  .choice-bar-letter {
-    font-family: 'Cinzel Decorative', serif; font-size: 16px;
-    color: var(--or); width: 22px; flex-shrink: 0;
-  }
-  .choice-bar-label {
-    font-family: 'Raleway', sans-serif; font-size: 13px;
-    color: var(--blanc); flex: 1; min-width: 0;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .choice-bar-bg {
-    width: 120px; height: 8px; background: rgba(255,255,255,0.08);
-    border-radius: 4px; overflow: hidden; flex-shrink: 0;
-  }
-  .choice-bar-fill {
-    height: 100%; background: linear-gradient(90deg, var(--or-fonce), var(--or));
-    border-radius: 4px; transition: width 0.4s ease; width: 0%;
-  }
-  .choice-bar-count {
-    font-family: 'Cinzel', serif; font-size: 12px;
-    color: var(--or); width: 30px; text-align: right; flex-shrink: 0;
-  }
+  .choice-bar-row { display:flex;align-items:center;gap:8px;margin-bottom:8px; }
+  .choice-bar-letter { font-family:'Cinzel Decorative',serif;font-size:15px;color:var(--or);width:20px;flex-shrink:0; }
+  .choice-bar-label { font-family:'Raleway',sans-serif;font-size:12px;color:var(--blanc);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .choice-bar-bg { width:100px;height:7px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;flex-shrink:0; }
+  .choice-bar-fill { height:100%;background:linear-gradient(90deg,var(--or-fonce),var(--or));border-radius:4px;transition:width 0.4s;width:0%; }
+  .choice-bar-count { font-family:'Cinzel',serif;font-size:12px;color:var(--or);width:24px;text-align:right;flex-shrink:0; }
 
   select {
     background: rgba(255,255,255,0.04); border: 1px solid rgba(201,168,76,0.3);
@@ -274,6 +255,7 @@
         <select id="round-select"></select>
       </div>
       <div class="controls-row">
+        <button class="btn btn-ghost" id="btn-show-rules">📜 Afficher les règles</button>
         <button class="btn btn-gold" id="btn-start-round">▶ Lancer la manche</button>
         <button class="btn btn-gold" id="btn-launch-questions" style="display:none">🚀 Démarrer les questions</button>
         <button class="btn btn-gold" id="btn-next-question" style="display:none">⏭ Question suivante</button>
@@ -287,8 +269,11 @@
 
     <!-- QUESTION EN COURS -->
     <div class="card" id="live-question-card" style="display:none">
-      <div class="card-title">Question en cours</div>
-      <div id="live-question-text" style="font-family:'Cinzel',serif;font-size:15px;color:var(--blanc);margin-bottom:16px;line-height:1.5;"></div>
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>Question en cours</span>
+        <span id="admin-timer" style="font-family:'Cinzel Decorative',serif;font-size:22px;color:var(--or);">30</span>
+      </div>
+      <div id="live-question-text" style="font-family:'Cinzel',serif;font-size:14px;color:var(--blanc);margin-bottom:14px;line-height:1.5;"></div>
       <div id="live-choices"></div>
     </div>
 
@@ -303,7 +288,7 @@
 
     <!-- DERNIERS MOTS -->
     <div class="card" id="farewell-card" style="display:none">
-      <div class="card-title">💀 Derniers Mots des Éliminés</div>
+      <div class="card-title">💀 Derniers Mots</div>
       <div id="farewell-list"></div>
     </div>
 
@@ -348,7 +333,7 @@ let currentRoundEditing = 0;
 let answeredCount = 0;
 let activeCount = 0;
 let currentQuestionData = null;
-let choiceVotes = [0, 0, 0, 0];
+let choiceVotes = [];
 const ROUND_NAMES = [
   'Épreuve du Bronze', "Sanctuaire d'Argent", 'Jugement des Gold Saints',
   'Nuit de Shura', "Réveil d'Athéna", 'Tempête du Cosmos',
@@ -391,10 +376,26 @@ function handleMsg(msg) {
     case 'questions_loaded':
       notify(`✅ ${msg.rounds} manche(s) chargée(s) !`);
       break;
+    case 'answer_count':
+      answeredCount = msg.answered;
+      activeCount = msg.total;
+      document.getElementById('stat-answered').textContent = answeredCount;
+      const pct = activeCount > 0 ? (answeredCount / activeCount * 100) : 0;
+      document.getElementById('answer-prog-bar').style.width = pct + '%';
+      document.getElementById('answer-prog-text').textContent = `${answeredCount} / ${activeCount}`;
+      document.getElementById('answer-progress-card').style.display = 'block';
+      break;
+    case 'timer':
+      document.getElementById('admin-timer').textContent = msg.value;
+      if (msg.value <= 10) document.getElementById('admin-timer').style.color = '#FF4444';
+      else document.getElementById('admin-timer').style.color = 'var(--or)';
+      break;
     case 'question':
       currentQuestionData = msg;
       choiceVotes = new Array(msg.choices.length).fill(0);
       showLiveQuestion(msg);
+      document.getElementById('admin-timer').textContent = '30';
+      document.getElementById('admin-timer').style.color = 'var(--or)';
       break;
     case 'answer_count':
       answeredCount = msg.answered;
@@ -404,14 +405,10 @@ function handleMsg(msg) {
       document.getElementById('answer-prog-bar').style.width = pct + '%';
       document.getElementById('answer-prog-text').textContent = `${answeredCount} / ${activeCount}`;
       document.getElementById('answer-progress-card').style.display = 'block';
-      // Mettre à jour les barres par choix si dispo
-      if (msg.choiceVotes) {
-        choiceVotes = msg.choiceVotes;
-        updateChoiceBars();
-      }
+      if (msg.choiceVotes) { choiceVotes = msg.choiceVotes; updateChoiceBars(); }
       break;
     case 'farewell_message':
-      showFarewellMessage(msg.pseudo, msg.message);
+      showFarewellMsg(msg.pseudo, msg.message);
       break;
     case 'player_joined':
       notify(`⚔ ${msg.pseudo} a rejoint la salle`);
@@ -491,8 +488,7 @@ function renderPlayers() {
 }
 
 function showLiveQuestion(msg) {
-  const card = document.getElementById('live-question-card');
-  card.style.display = 'block';
+  document.getElementById('live-question-card').style.display = 'block';
   document.getElementById('live-question-text').textContent = msg.question;
   const letters = ['A','B','C','D'];
   const container = document.getElementById('live-choices');
@@ -500,7 +496,6 @@ function showLiveQuestion(msg) {
   msg.choices.forEach((choice, i) => {
     const row = document.createElement('div');
     row.className = 'choice-bar-row';
-    row.id = `choice-row-${i}`;
     row.innerHTML = `
       <span class="choice-bar-letter">${letters[i]}</span>
       <span class="choice-bar-label">${choice}</span>
@@ -521,17 +516,12 @@ function updateChoiceBars() {
   });
 }
 
-function showFarewellMessage(pseudo, message) {
-  const card = document.getElementById('farewell-card');
-  const list = document.getElementById('farewell-list');
-  card.style.display = 'block';
+function showFarewellMsg(pseudo, message) {
+  document.getElementById('farewell-card').style.display = 'block';
   const div = document.createElement('div');
-  div.style.cssText = 'padding:12px;border-bottom:1px solid rgba(201,168,76,0.1);';
-  div.innerHTML = `
-    <span style="font-family:'Cinzel',serif;font-size:13px;color:var(--or);">💀 ${pseudo}</span>
-    <div style="font-family:'Raleway',sans-serif;font-size:14px;color:var(--blanc);margin-top:6px;font-style:italic;">"${message}"</div>
-  `;
-  list.appendChild(div);
+  div.style.cssText = 'padding:10px;border-bottom:1px solid rgba(201,168,76,0.1);';
+  div.innerHTML = `<span style="font-family:'Cinzel',serif;font-size:13px;color:var(--or);">💀 ${pseudo}</span><div style="font-family:'Raleway',sans-serif;font-size:13px;color:var(--blanc);margin-top:4px;font-style:italic;">"${message}"</div>`;
+  document.getElementById('farewell-list').appendChild(div);
   notify(`💬 Dernier mot de ${pseudo}`);
 }
 
@@ -632,6 +622,8 @@ document.getElementById('btn-save-questions').onclick = () => {
 };
 
 // ── Contrôles ─────────────────────────────────────────────────────────────────
+document.getElementById('btn-show-rules').onclick = () => send({ type: 'show_rules' });
+
 document.getElementById('btn-start-round').onclick = () => {
   const idx = parseInt(document.getElementById('round-select').value);
   send({ type: 'start_round', roundIndex: idx });
