@@ -24,7 +24,6 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: var(--noir); color: var(--blanc); font-family: 'Raleway', sans-serif; min-height: 100vh; }
 
-  /* ── LOGIN ── */
   #login-screen {
     min-height: 100vh; display: flex; align-items: center; justify-content: center;
     background: radial-gradient(ellipse at center, #1a1500 0%, var(--noir) 70%);
@@ -38,8 +37,7 @@
     width: 100%; padding: 14px; background: rgba(201,168,76,0.05);
     border: 1px solid var(--or-fonce); border-radius: 4px;
     color: var(--or-clair); font-family: 'Cinzel', serif; font-size: 16px;
-    text-align: center; outline: none; letter-spacing: 4px;
-    margin-bottom: 14px;
+    text-align: center; outline: none; letter-spacing: 4px; margin-bottom: 14px;
   }
   .login-input:focus { border-color: var(--or); box-shadow: var(--glow); }
   .login-btn {
@@ -49,7 +47,6 @@
   }
   .login-error { color: #FF4444; font-size: 12px; margin-top: 10px; min-height: 18px; }
 
-  /* ── ADMIN LAYOUT ── */
   #admin-screen { display: none; }
   .admin-header {
     background: var(--noir-card); border-bottom: 1px solid var(--or-fonce);
@@ -63,11 +60,9 @@
   }
   .status-lobby { background: rgba(201,168,76,0.1); border: 1px solid var(--or-fonce); color: var(--or); }
   .status-playing { background: rgba(76,175,80,0.1); border: 1px solid #4CAF50; color: #4CAF50; }
-  .status-eliminated { background: rgba(139,0,0,0.2); border: 1px solid var(--rouge); color: #FF4444; }
 
   .admin-body { padding: 16px; max-width: 900px; margin: 0 auto; }
 
-  /* ── CARDS ── */
   .card {
     background: var(--noir-card); border: 1px solid rgba(201,168,76,0.15);
     border-radius: 8px; padding: 16px; margin-bottom: 14px;
@@ -78,7 +73,6 @@
     padding-bottom: 8px; border-bottom: 1px solid rgba(201,168,76,0.1);
   }
 
-  /* ── STATS BAR ── */
   .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
   .stat-box {
     background: var(--noir-card); border: 1px solid rgba(201,168,76,0.15);
@@ -87,7 +81,6 @@
   .stat-num { font-family: 'Cinzel Decorative', serif; font-size: 28px; color: var(--or); }
   .stat-label { font-size: 10px; letter-spacing: 2px; color: var(--gris); text-transform: uppercase; margin-top: 4px; }
 
-  /* ── BOUTONS ── */
   .btn {
     padding: 10px 18px; border: none; border-radius: 4px; cursor: pointer;
     font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600;
@@ -104,16 +97,14 @@
   .btn-pause { background: #2a2a00; border: 1px solid #888800; color: #CCCC00; }
   .btn-pause.active { background: #222; border-color: var(--or-fonce); color: var(--or-fonce); }
   .btn-sm { padding: 6px 12px; font-size: 10px; }
-  .btn-full { width: 100%; margin-bottom: 8px; }
 
   .controls-row { display: flex; flex-wrap: wrap; gap: 8px; }
 
-  /* ── PLAYERS LIST ── */
   .player-item {
     display: flex; align-items: center; gap: 10px;
     padding: 10px 12px; background: rgba(255,255,255,0.02);
     border: 1px solid rgba(255,255,255,0.05); border-radius: 6px;
-    margin-bottom: 6px; transition: all 0.2s;
+    margin-bottom: 6px;
   }
   .player-item.eliminated { opacity: 0.45; background: rgba(139,0,0,0.08); border-color: rgba(139,0,0,0.2); }
   .player-rank { font-family: 'Cinzel Decorative', serif; font-size: 14px; color: var(--or-fonce); width: 24px; }
@@ -127,7 +118,7 @@
   .badge-waiting { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--gris); }
   .badge-eliminated { background: rgba(139,0,0,0.15); border: 1px solid var(--rouge); color: #FF4444; }
 
-  /* ── QUESTIONS EDITOR ── */
+  /* ── QUESTIONS EDITOR — FIXED ── */
   .question-editor { display: none; }
   .question-editor.active { display: block; }
   .round-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
@@ -162,29 +153,14 @@
   }
   .add-q-btn:hover { border-color: var(--or); color: var(--or); }
 
-  /* ── ANSWER FEED ── */
-  .answer-feed { max-height: 200px; overflow-y: auto; }
-  .answer-item {
-    padding: 8px 10px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.04);
-    display: flex; gap: 10px; align-items: center;
+  /* Questions loaded counter */
+  .q-loaded-badge {
+    display: inline-block; background: rgba(76,175,80,0.15); border: 1px solid #4CAF50;
+    color: #4CAF50; font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px;
+    padding: 3px 10px; border-radius: 10px; margin-left: 10px;
   }
-  .answer-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .dot-correct { background: #4CAF50; }
-  .dot-wrong { background: #F44336; }
 
-  /* ── NOTIFICATION ── */
-  .notif {
-    position: fixed; top: 20px; right: 20px; padding: 12px 20px;
-    background: var(--noir-card); border: 1px solid var(--or); border-radius: 6px;
-    font-family: 'Cinzel', serif; font-size: 12px; color: var(--or); letter-spacing: 2px;
-    z-index: 100; transform: translateX(200px); opacity: 0; transition: all 0.3s;
-  }
-  .notif.show { transform: translateX(0); opacity: 1; }
-
-  /* ── Réponse count ── */
-  .answer-progress {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
-  }
+  .answer-progress { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
   .progress-bar-bg { flex: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
   .progress-bar { height: 100%; background: linear-gradient(90deg, var(--or-fonce), var(--or)); transition: width 0.3s; width: 0%; }
   .progress-text { font-family: 'Cinzel', serif; font-size: 13px; color: var(--or); min-width: 60px; text-align: right; }
@@ -196,6 +172,14 @@
   .choice-bar-fill { height:100%;background:linear-gradient(90deg,var(--or-fonce),var(--or));border-radius:4px;transition:width 0.4s;width:0%; }
   .choice-bar-count { font-family:'Cinzel',serif;font-size:12px;color:var(--or);width:24px;text-align:right;flex-shrink:0; }
 
+  .notif {
+    position: fixed; top: 20px; right: 20px; padding: 12px 20px;
+    background: var(--noir-card); border: 1px solid var(--or); border-radius: 6px;
+    font-family: 'Cinzel', serif; font-size: 12px; color: var(--or); letter-spacing: 2px;
+    z-index: 100; transform: translateX(200px); opacity: 0; transition: all 0.3s;
+  }
+  .notif.show { transform: translateX(0); opacity: 1; }
+
   select {
     background: rgba(255,255,255,0.04); border: 1px solid rgba(201,168,76,0.3);
     border-radius: 4px; padding: 10px 12px; color: var(--or); font-family: 'Cinzel', serif;
@@ -205,7 +189,6 @@
 </head>
 <body>
 
-<!-- NOTIFICATION -->
 <div class="notif" id="notif"></div>
 
 <!-- LOGIN -->
@@ -227,27 +210,14 @@
 
   <div class="admin-body">
 
-    <!-- STATS -->
     <div class="stats-row">
-      <div class="stat-box">
-        <div class="stat-num" id="stat-total">0</div>
-        <div class="stat-label">Joueurs</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" id="stat-active">0</div>
-        <div class="stat-label">En jeu</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" id="stat-eliminated">0</div>
-        <div class="stat-label">Éliminés</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" id="stat-answered">0</div>
-        <div class="stat-label">Ont répondu</div>
-      </div>
+      <div class="stat-box"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Joueurs</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-active">0</div><div class="stat-label">En jeu</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-eliminated">0</div><div class="stat-label">Éliminés</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-answered">0</div><div class="stat-label">Ont répondu</div></div>
     </div>
 
-    <!-- CONTRÔLES PRINCIPAUX -->
+    <!-- CONTRÔLES -->
     <div class="card">
       <div class="card-title">Contrôles de Partie</div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
@@ -296,16 +266,17 @@
     <div class="card">
       <div class="card-title">Légionnaires</div>
       <div id="players-list">
-        <div style="color:var(--gris);font-size:13px;text-align:center;padding:20px;">
-          En attente de connexions...
-        </div>
+        <div style="color:var(--gris);font-size:13px;text-align:center;padding:20px;">En attente de connexions...</div>
       </div>
     </div>
 
     <!-- ÉDITEUR DE QUESTIONS -->
     <div class="card">
-      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
-        <span>Questions du Quiz</span>
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <span>
+          Questions du Quiz
+          <span id="q-loaded-badge" class="q-loaded-badge" style="display:none">✓ Chargées</span>
+        </span>
         <div style="display:flex;gap:8px;">
           <button class="btn btn-ghost btn-sm" id="btn-toggle-editor">✏ Éditer</button>
           <button class="btn btn-gold btn-sm" id="btn-save-questions">💾 Sauvegarder & Charger</button>
@@ -325,22 +296,42 @@
 </div>
 
 <script>
+// ═══════════════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════════════
 const WS_URL = `wss://${location.host}`;
-let ws;
-let gameData = { players: {}, phase: 'lobby' };
-let questionsData = []; // [ [{question, choices:[],correct:0}, ...], ... ]
-let currentRoundEditing = 0;
-let answeredCount = 0;
-let activeCount = 0;
-let currentQuestionData = null;
-let choiceVotes = [];
 const ROUND_NAMES = [
   'Épreuve du Bronze', "Sanctuaire d'Argent", 'Jugement des Gold Saints',
   'Nuit de Shura', "Réveil d'Athéna", 'Tempête du Cosmos',
   'Ultime Chrysaor', 'LE CHAMP ÉLYSÉE'
 ];
+const LETTERS = ['A','B','C','D'];
 
-// ── WS ──────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════
+let ws;
+let gameData = { players: {}, phase: 'lobby' };
+let currentRoundEditing = 0;
+let answeredCount = 0;
+let activeCount = 0;
+let currentQuestionData = null;
+let choiceVotes = [];
+let paused = false;
+
+// ── questionsData : source de vérité, JAMAIS écrasée sans sauvegarde ──
+// Structure : Array(8) de Array(n) de { question:'', choices:['','','',''], correct:0 }
+let questionsData = initEmptyQuestions();
+
+function initEmptyQuestions() {
+  return Array.from({length: 8}, () => [
+    { question: '', choices: ['', '', '', ''], correct: 0 }
+  ]);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// WEBSOCKET
+// ═══════════════════════════════════════════════════════════════════════
 function connect() {
   ws = new WebSocket(WS_URL);
   ws.onopen = () => {};
@@ -349,10 +340,9 @@ function connect() {
 }
 
 function send(obj) {
-  if (ws.readyState === WebSocket.OPEN) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify(obj));
-  } else {
-    // Attendre la connexion puis envoyer
+  } else if (ws) {
     ws.addEventListener('open', () => ws.send(JSON.stringify(obj)), { once: true });
   }
 }
@@ -364,7 +354,9 @@ function notify(text) {
   setTimeout(() => n.classList.remove('show'), 2500);
 }
 
-// ── Messages ─────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════
+// MESSAGES WS
+// ═══════════════════════════════════════════════════════════════════════
 function handleMsg(msg) {
   switch(msg.type) {
     case 'admin_ok':
@@ -382,11 +374,11 @@ function handleMsg(msg) {
       break;
     case 'questions_loaded':
       notify(`✅ ${msg.rounds} manche(s) chargée(s) !`);
+      document.getElementById('q-loaded-badge').style.display = 'inline-block';
       break;
     case 'timer':
       document.getElementById('admin-timer').textContent = msg.value;
-      if (msg.value <= 10) document.getElementById('admin-timer').style.color = '#FF4444';
-      else document.getElementById('admin-timer').style.color = 'var(--or)';
+      document.getElementById('admin-timer').style.color = msg.value <= 10 ? '#FF4444' : 'var(--or)';
       break;
     case 'question':
       currentQuestionData = msg;
@@ -399,8 +391,8 @@ function handleMsg(msg) {
       answeredCount = msg.answered;
       activeCount = msg.total;
       document.getElementById('stat-answered').textContent = answeredCount;
-      const answerPct = activeCount > 0 ? (answeredCount / activeCount * 100) : 0;
-      document.getElementById('answer-prog-bar').style.width = answerPct + '%';
+      const pct = activeCount > 0 ? (answeredCount / activeCount * 100) : 0;
+      document.getElementById('answer-prog-bar').style.width = pct + '%';
       document.getElementById('answer-prog-text').textContent = `${answeredCount} / ${activeCount}`;
       document.getElementById('answer-progress-card').style.display = 'block';
       if (msg.choiceVotes) { choiceVotes = msg.choiceVotes; updateChoiceBars(); }
@@ -427,59 +419,50 @@ function handleMsg(msg) {
   }
 }
 
-// ── Render ───────────────────────────────────────────────────────────────────
-function renderAll() {
-  renderStats();
-  renderPlayers();
-  renderPhase();
-}
+// ═══════════════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════════════
+function renderAll() { renderStats(); renderPlayers(); renderPhase(); }
 
 function renderStats() {
   const players = Object.values(gameData.players || {});
-  const active = players.filter(p => !p.eliminated);
-  const eliminated = players.filter(p => p.eliminated);
   document.getElementById('stat-total').textContent = players.length;
-  document.getElementById('stat-active').textContent = active.length;
-  document.getElementById('stat-eliminated').textContent = eliminated.length;
+  document.getElementById('stat-active').textContent = players.filter(p => !p.eliminated).length;
+  document.getElementById('stat-eliminated').textContent = players.filter(p => p.eliminated).length;
 }
 
 function renderPhase() {
   const badge = document.getElementById('phase-badge');
   const phase = gameData.phase;
   badge.textContent = phase.toUpperCase().replace('_', ' ');
-  badge.className = 'status-badge';
-  if (phase === 'playing') badge.classList.add('status-playing');
-  else if (phase === 'lobby') badge.classList.add('status-lobby');
-  else badge.classList.add('status-lobby');
+  badge.className = 'status-badge ' + (phase === 'playing' ? 'status-playing' : 'status-lobby');
 }
 
 function renderPlayers() {
   const list = document.getElementById('players-list');
-  const players = Object.values(gameData.players || {});
+  const players = Object.values(gameData.players || {}).sort((a, b) => b.score - a.score);
   if (!players.length) {
     list.innerHTML = '<div style="color:var(--gris);font-size:13px;text-align:center;padding:20px;">En attente de connexions...</div>';
     return;
   }
-  // Trier par score desc
-  players.sort((a, b) => b.score - a.score);
   list.innerHTML = '';
   players.forEach((p, i) => {
     const div = document.createElement('div');
     div.className = 'player-item' + (p.eliminated ? ' eliminated' : '');
-    const answerBadge = p.eliminated
+    const badge = p.eliminated
       ? '<span class="player-answer-badge badge-eliminated">💀 ÉLIMINÉ</span>'
       : p.answered
         ? '<span class="player-answer-badge badge-answered">✓ Répondu</span>'
         : '<span class="player-answer-badge badge-waiting">En attente</span>';
-    const elimBtn = p.eliminated
+    const btn = p.eliminated
       ? `<button class="btn btn-ghost btn-sm" onclick="restorePlayer('${p.id}')">↩ Remettre</button>`
       : `<button class="btn btn-danger btn-sm" onclick="eliminatePlayer('${p.id}')">💀 Élim.</button>`;
     div.innerHTML = `
       <span class="player-rank">${i + 1}</span>
       <span class="player-pseudo">${p.pseudo}</span>
-      ${answerBadge}
+      ${badge}
       <span class="player-score">${(p.score || 0).toLocaleString()} pts</span>
-      ${elimBtn}
+      ${btn}
     `;
     list.appendChild(div);
   });
@@ -488,14 +471,13 @@ function renderPlayers() {
 function showLiveQuestion(msg) {
   document.getElementById('live-question-card').style.display = 'block';
   document.getElementById('live-question-text').textContent = msg.question;
-  const letters = ['A','B','C','D'];
   const container = document.getElementById('live-choices');
   container.innerHTML = '';
   msg.choices.forEach((choice, i) => {
     const row = document.createElement('div');
     row.className = 'choice-bar-row';
     row.innerHTML = `
-      <span class="choice-bar-letter">${letters[i]}</span>
+      <span class="choice-bar-letter">${LETTERS[i]}</span>
       <span class="choice-bar-label">${choice}</span>
       <div class="choice-bar-bg"><div class="choice-bar-fill" id="bar-fill-${i}"></div></div>
       <span class="choice-bar-count" id="bar-count-${i}">0</span>
@@ -526,29 +508,53 @@ function showFarewellMsg(pseudo, message) {
 function eliminatePlayer(id) { send({ type: 'eliminate', playerId: id }); }
 function restorePlayer(id) { send({ type: 'restore', playerId: id }); }
 
-// ── Round select ─────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════
+// ROUND SELECT
+// ═══════════════════════════════════════════════════════════════════════
 function buildRoundSelect() {
   const sel = document.getElementById('round-select');
   sel.innerHTML = '';
   ROUND_NAMES.forEach((name, i) => {
     const opt = document.createElement('option');
-    opt.value = i; opt.textContent = `Manche ${i+1} — ${name}`;
+    opt.value = i;
+    opt.textContent = `Manche ${i+1} — ${name}`;
     sel.appendChild(opt);
   });
 }
 
-// ── Questions Editor ─────────────────────────────────────────────────────────
-function initQuestionsData() {
-  // 8 manches × 8 questions vides
-  questionsData = Array.from({length: 8}, () =>
-    Array.from({length: 8}, () => ({
-      question: '',
-      choices: ['', '', '', ''],
-      correct: 0
-    }))
-  );
+// ═══════════════════════════════════════════════════════════════════════
+// ÉDITEUR DE QUESTIONS — VERSION CORRIGÉE
+// ═══════════════════════════════════════════════════════════════════════
+
+/**
+ * FONCTION CLÉ : lit tous les inputs du DOM et sauvegarde dans questionsData
+ * À appeler AVANT toute reconstruction du DOM (changement d'onglet, ajout de question, etc.)
+ */
+function saveCurrentRoundFromDOM() {
+  const container = document.getElementById('questions-container');
+  if (!container || !container.children.length) return;
+
+  const blocks = container.querySelectorAll('.q-block');
+  blocks.forEach((block, qi) => {
+    if (!questionsData[currentRoundEditing][qi]) return;
+
+    // Lire l'énoncé
+    const qInput = block.querySelector('.q-input');
+    if (qInput) questionsData[currentRoundEditing][qi].question = qInput.value;
+
+    // Lire les choix
+    const cInputs = block.querySelectorAll('.c-input');
+    cInputs.forEach((inp, ci) => {
+      questionsData[currentRoundEditing][qi].choices[ci] = inp.value;
+    });
+
+    // Lire la bonne réponse
+    const radios = block.querySelectorAll('.correct-radio');
+    radios.forEach((radio, ci) => {
+      if (radio.checked) questionsData[currentRoundEditing][qi].correct = ci;
+    });
+  });
 }
-initQuestionsData();
 
 function buildRoundTabs() {
   const tabs = document.getElementById('round-tabs');
@@ -558,7 +564,12 @@ function buildRoundTabs() {
     div.className = 'round-tab' + (i === currentRoundEditing ? ' active' : '');
     div.textContent = `M${i+1}`;
     div.title = name;
-    div.onclick = () => { currentRoundEditing = i; buildRoundTabs(); buildQuestionsUI(); };
+    div.addEventListener('click', () => {
+      saveCurrentRoundFromDOM();   // ← SAUVEGARDER avant de changer d'onglet
+      currentRoundEditing = i;
+      buildRoundTabs();
+      buildQuestionsUI();
+    });
     tabs.appendChild(div);
   });
 }
@@ -566,35 +577,71 @@ function buildRoundTabs() {
 function buildQuestionsUI() {
   const container = document.getElementById('questions-container');
   container.innerHTML = '';
+
   const roundQs = questionsData[currentRoundEditing];
-  const letters = ['A','B','C','D'];
+
   roundQs.forEach((q, qi) => {
     const block = document.createElement('div');
     block.className = 'q-block';
-    block.innerHTML = `
-      <div class="q-num">— QUESTION ${qi+1} —</div>
-      <input type="text" class="q-input" placeholder="Énoncé de la question..." value="${q.question}" 
-        oninput="questionsData[${currentRoundEditing}][${qi}].question=this.value">
-      ${q.choices.map((c, ci) => `
-        <div class="c-row">
-          <span class="c-letter">${letters[ci]}</span>
-          <input type="text" class="c-input" placeholder="Choix ${letters[ci]}..." value="${c}"
-            oninput="questionsData[${currentRoundEditing}][${qi}].choices[${ci}]=this.value">
-          <input type="radio" class="correct-radio" name="correct_${currentRoundEditing}_${qi}" 
-            ${q.correct === ci ? 'checked' : ''} onchange="questionsData[${currentRoundEditing}][${qi}].correct=${ci}">
-          <label class="correct-label">Correct</label>
-        </div>
-      `).join('')}
-    `;
+    block.dataset.qi = qi;
+
+    // Énoncé
+    const qNum = document.createElement('div');
+    qNum.className = 'q-num';
+    qNum.textContent = `— QUESTION ${qi+1} —`;
+    block.appendChild(qNum);
+
+    const qInput = document.createElement('input');
+    qInput.type = 'text';
+    qInput.className = 'q-input';
+    qInput.placeholder = 'Énoncé de la question...';
+    qInput.value = q.question;
+    // PAS de oninput qui relit questionsData — on lit au moment de sauvegarder
+    block.appendChild(qInput);
+
+    // Choix A B C D
+    q.choices.forEach((choice, ci) => {
+      const row = document.createElement('div');
+      row.className = 'c-row';
+
+      const letter = document.createElement('span');
+      letter.className = 'c-letter';
+      letter.textContent = LETTERS[ci];
+      row.appendChild(letter);
+
+      const cInput = document.createElement('input');
+      cInput.type = 'text';
+      cInput.className = 'c-input';
+      cInput.placeholder = `Choix ${LETTERS[ci]}...`;
+      cInput.value = choice;
+      row.appendChild(cInput);
+
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.className = 'correct-radio';
+      radio.name = `correct_${currentRoundEditing}_${qi}`;
+      radio.checked = q.correct === ci;
+      row.appendChild(radio);
+
+      const label = document.createElement('label');
+      label.className = 'correct-label';
+      label.textContent = 'Correct';
+      row.appendChild(label);
+
+      block.appendChild(row);
+    });
+
     container.appendChild(block);
   });
 }
 
-document.getElementById('btn-toggle-editor').onclick = () => {
+// Toggle éditeur
+document.getElementById('btn-toggle-editor').addEventListener('click', () => {
   const editor = document.getElementById('question-editor');
   const msg = document.getElementById('editor-closed-msg');
   const isOpen = editor.classList.contains('active');
   if (isOpen) {
+    saveCurrentRoundFromDOM(); // ← SAUVEGARDER avant de fermer
     editor.classList.remove('active');
     msg.style.display = 'block';
   } else {
@@ -603,34 +650,54 @@ document.getElementById('btn-toggle-editor').onclick = () => {
     buildRoundTabs();
     buildQuestionsUI();
   }
-};
+});
 
-document.getElementById('btn-add-question').onclick = () => {
-  questionsData[currentRoundEditing].push({ question: '', choices: ['','','',''], correct: 0 });
+// Ajouter une question
+document.getElementById('btn-add-question').addEventListener('click', () => {
+  saveCurrentRoundFromDOM(); // ← SAUVEGARDER avant de reconstruire
+  questionsData[currentRoundEditing].push({ question: '', choices: ['', '', '', ''], correct: 0 });
   buildQuestionsUI();
-};
+  // Scroller vers le bas pour voir la nouvelle question
+  setTimeout(() => {
+    const container = document.getElementById('questions-container');
+    container.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 50);
+});
 
-document.getElementById('btn-save-questions').onclick = () => {
-  // Filtrer les questions vides
+// Sauvegarder & charger sur le serveur
+document.getElementById('btn-save-questions').addEventListener('click', () => {
+  saveCurrentRoundFromDOM(); // ← SAUVEGARDER le round en cours avant d'envoyer
+
+  // Filtrer les questions dont l'énoncé est vide, garder les manches non vides
   const filtered = questionsData.map(round =>
     round.filter(q => q.question.trim() !== '')
   ).filter(round => round.length > 0);
-  if (!filtered.length) { notify('❌ Aucune question saisie !'); return; }
+
+  if (!filtered.length) {
+    notify('❌ Aucune question saisie !');
+    return;
+  }
+
+  // Compter le total
+  const total = filtered.reduce((acc, r) => acc + r.length, 0);
   send({ type: 'load_questions', questions: filtered });
-};
+  notify(`📤 ${total} question(s) envoyée(s) au serveur`);
+});
 
-// ── Contrôles ─────────────────────────────────────────────────────────────────
-document.getElementById('btn-show-rules').onclick = () => send({ type: 'show_rules' });
+// ═══════════════════════════════════════════════════════════════════════
+// CONTRÔLES DE PARTIE
+// ═══════════════════════════════════════════════════════════════════════
+document.getElementById('btn-show-rules').addEventListener('click', () => send({ type: 'show_rules' }));
 
-document.getElementById('btn-start-round').onclick = () => {
+document.getElementById('btn-start-round').addEventListener('click', () => {
   const idx = parseInt(document.getElementById('round-select').value);
   send({ type: 'start_round', roundIndex: idx });
   document.getElementById('btn-launch-questions').style.display = 'inline-block';
   document.getElementById('btn-next-question').style.display = 'none';
   document.getElementById('btn-reveal').style.display = 'none';
-};
+});
 
-document.getElementById('btn-launch-questions').onclick = () => {
+document.getElementById('btn-launch-questions').addEventListener('click', () => {
   send({ type: 'launch_questions' });
   document.getElementById('btn-launch-questions').style.display = 'none';
   document.getElementById('btn-next-question').style.display = 'inline-block';
@@ -639,43 +706,42 @@ document.getElementById('btn-launch-questions').onclick = () => {
   answeredCount = 0; activeCount = 0;
   document.getElementById('answer-prog-bar').style.width = '0%';
   document.getElementById('answer-prog-text').textContent = '0 / 0';
-};
+});
 
-document.getElementById('btn-next-question').onclick = () => {
+document.getElementById('btn-next-question').addEventListener('click', () => {
   send({ type: 'next_question' });
   answeredCount = 0;
   document.getElementById('stat-answered').textContent = '0';
   document.getElementById('answer-prog-bar').style.width = '0%';
-};
+});
 
-document.getElementById('btn-reveal').onclick = () => send({ type: 'reveal' });
+document.getElementById('btn-reveal').addEventListener('click', () => send({ type: 'reveal' }));
 
-let paused = false;
-document.getElementById('btn-pause').onclick = () => {
+document.getElementById('btn-pause').addEventListener('click', () => {
   paused = !paused;
   send({ type: 'pause' });
   const btn = document.getElementById('btn-pause');
   btn.textContent = paused ? '▶ Reprendre' : '⏸ Pause';
   btn.classList.toggle('active', paused);
-};
+});
 
-document.getElementById('btn-final').onclick = () => {
+document.getElementById('btn-final').addEventListener('click', () => {
   if (confirm('Lancer la FINALE ?')) send({ type: 'start_final' });
-};
+});
 
-document.getElementById('btn-end-game').onclick = () => {
+document.getElementById('btn-end-game').addEventListener('click', () => {
   if (confirm('Terminer la partie et afficher le vainqueur ?')) send({ type: 'end_game' });
-};
+});
 
-document.getElementById('btn-reset').onclick = () => {
+document.getElementById('btn-reset').addEventListener('click', () => {
   if (confirm('⚠ Reset complet ? Tous les joueurs et scores seront perdus.')) send({ type: 'reset' });
-};
+});
 
-// ── Login ────────────────────────────────────────────────────────────────────
-document.getElementById('admin-login-btn').onclick = () => {
+// ── Login ──
+document.getElementById('admin-login-btn').addEventListener('click', () => {
   const pw = document.getElementById('admin-password').value;
   send({ type: 'admin_login', password: pw });
-};
+});
 document.getElementById('admin-password').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('admin-login-btn').click();
 });
